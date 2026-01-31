@@ -28,15 +28,17 @@ PlasmoidItem {
         tomorrowPrices: root.tomorrowPrices
         showingTomorrow: root.showingTomorrow
         tomorrowAvailable: root.tomorrowAvailable
-        currentHour: new Date().getHours()
+        currentHour: root.lastKnownHour
         onToggleDay: root.toggleDay()
     }
     
     // Property for next update time display
     property string nextUpdateTime: ""
+    property int lastKnownHour: -1
     
     Component.onCompleted: {
         PriceFetcher.initialize()
+        lastKnownHour = new Date().getHours()
         refreshData()
         
         // Set up timer to update at next 14:15
@@ -51,6 +53,22 @@ PlasmoidItem {
             refreshData()
             // After first update at 14:15, schedule next one for tomorrow
             scheduleNextUpdate()
+        }
+    }
+    
+    // Timer to check for hour changes every minute
+    Timer {
+        id: hourCheckTimer
+        interval: 60000 // Check every minute
+        repeat: true
+        running: true
+        onTriggered: {
+            var currentHour = new Date().getHours()
+            if (currentHour !== root.lastKnownHour) {
+                console.log("Hour changed from", root.lastKnownHour, "to", currentHour)
+                root.lastKnownHour = currentHour
+                updateCurrentPrice()
+            }
         }
     }
     
