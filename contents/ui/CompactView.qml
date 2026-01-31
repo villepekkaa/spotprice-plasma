@@ -8,10 +8,17 @@ Item {
     property real price: 0.0
     property string priceColor: "#4CAF50"
     
+    signal clicked()
+    
     Layout.fillWidth: true
     Layout.fillHeight: true
     Layout.minimumWidth: 85
     Layout.preferredWidth: 90
+    
+    MouseArea {
+        anchors.fill: parent
+        onClicked: parent.clicked()
+    }
     
     Rectangle {
         anchors.fill: parent
