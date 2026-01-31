@@ -102,47 +102,10 @@ function fetchFromAPI(callback) {
 }
 
 function parsePrices(data) {
-    var hourlyPrices = []
-    
-    // Get today's date string
+    // Get today's date string and delegate to parsePricesForDate
     var today = new Date()
     var todayStr = formatDate(today)
-    
-    // Group prices by hour
-    var hourGroups = {}
-    
-    for (var i = 0; i < data.length; i++) {
-        var item = data[i]
-        var itemDate = item.DateTime.split('T')[0]
-        
-        // Only process today's data
-        if (itemDate === todayStr) {
-            // Extract hour from DateTime (e.g., "2026-01-31T14:30:00+02:00" -> 14)
-            var hour = parseInt(item.DateTime.split('T')[1].split(':')[0])
-            
-            if (!hourGroups[hour]) {
-                hourGroups[hour] = []
-            }
-            
-            // Convert price to c/kWh and add to group
-            hourGroups[hour].push(item.PriceWithTax * 100)
-        }
-    }
-    
-    // Calculate average for each hour (0-23)
-    for (var h = 0; h < 24; h++) {
-        if (hourGroups[h] && hourGroups[h].length > 0) {
-            var sum = 0
-            for (var j = 0; j < hourGroups[h].length; j++) {
-                sum += hourGroups[h][j]
-            }
-            hourlyPrices.push(sum / hourGroups[h].length)
-        } else {
-            hourlyPrices.push(0) // No data for this hour
-        }
-    }
-    
-    return hourlyPrices
+    return parsePricesForDate(data, todayStr)
 }
 
 function parsePricesForDate(data, dateStr) {
