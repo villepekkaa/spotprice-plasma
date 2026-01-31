@@ -18,36 +18,54 @@ A KDE Plasma 6 widget for displaying Finnish electricity spot prices from spot-h
 
 ## Installation
 
-### From Source
+### Standard Method (Recommended)
 
-1. Clone the repository:
+Using KDE's official package tool:
+
 ```bash
+# Clone the repository
 git clone https://github.com/villepekkaa/spotprices.git
 cd spotprices
+
+# Install the widget
+kpackagetool6 --install .
+
+# Or if updating an existing installation:
+kpackagetool6 --upgrade .
 ```
 
-2. Copy to Plasma widgets directory (excluding .git):
+### Alternative Methods
+
+**Method 1: Manual Copy**
 ```bash
 mkdir -p ~/.local/share/plasma/plasmoids/com.villepekkaa.spotprice
 cp -r contents metadata.json LICENSE README.md AGENTS.md ~/.local/share/plasma/plasmoids/com.villepekkaa.spotprice/
 ```
 
-3. Restart Plasma or run:
+**Method 2: Using Makefile (if available)**
 ```bash
-kpackagetool6 --upgrade ~/.local/share/plasma/plasmoids/com.villepekkaa.spotprice
+make install
 ```
 
-Alternative restart methods:
+### After Installation
+
+Restart Plasma to load the widget:
 ```bash
-kquitapp6 plasmashell && kstart plasmashell
+kpackagetool6 --global --upgrade ~/.local/share/plasma/plasmoids/com.villepekkaa.spotprice
 # or
-plasmashell --replace
+kquitapp6 plasmashell && kstart plasmashell
 ```
 
-4. Add widget to your desktop or panel:
+Then add the widget to your desktop or panel:
    - Right-click on desktop/panel → Add Widgets
    - Search for "SpotPrice"
    - Drag to desired location
+
+### Future: KDE Store (Discover/GHNS)
+
+Once published to [KDE Store](https://store.kde.org), you can install directly through:
+- **Discover** (Software Center) → Plasma Addons
+- **Plasma Widget Explorer** → Get New Widgets → Download New Plasma Widgets
 
 ## Usage
 
