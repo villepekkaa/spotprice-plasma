@@ -22,7 +22,6 @@ function fetchPrices(callback) {
     
     // Always fetch if no today's data in cache
     if (!hasTodayData) {
-        console.log("Fetching prices: no today's data in cache")
         fetchFromAPI(callback)
         return
     }
@@ -32,13 +31,11 @@ function fetchPrices(callback) {
     var hasTomorrowData = cached.tomorrow.length > 0
     
     if (isAfter1415 && !hasTomorrowData) {
-        console.log("Fetching prices: after 14:15, no tomorrow data")
         fetchFromAPI(callback)
         return
     }
     
     // Use cached data
-    console.log("Using cached prices")
     callback(cached.today, cached.tomorrow)
 }
 
@@ -55,29 +52,22 @@ function fetchFromAPI(callback) {
     function checkComplete() {
         requestsCompleted++
         if (requestsCompleted >= 2) {
-            console.log("Both requests complete, calling callback with:", today.length, tomorrow.length)
             cachePrices(today, tomorrow)
             callback(today, tomorrow)
         }
     }
     
     // Fetch today's prices
-    console.log("Fetching today's prices from API...")
     var todayReq = new XMLHttpRequest()
     todayReq.onreadystatechange = function() {
         if (todayReq.readyState === XMLHttpRequest.DONE) {
-            console.log("Today's API response status:", todayReq.status)
             if (todayReq.status === 200) {
                 try {
                     var data = JSON.parse(todayReq.responseText)
-                    console.log("Today's data count:", data.length)
                     today = parsePrices(data)
-                    console.log("Today's parsed prices:", today.length)
                 } catch (e) {
-                    console.log("Error parsing today's prices:", e)
                 }
             } else {
-                console.log("API error:", todayReq.statusText)
             }
             checkComplete()
         }
@@ -101,7 +91,6 @@ function fetchFromAPI(callback) {
                     var tomorrowStr = formatDate(tomorrowDate)
                     tomorrow = parsePricesForDate(data, tomorrowStr)
                 } catch (e) {
-                    console.log("Error parsing tomorrow's prices:", e)
                 }
             }
             checkComplete()
@@ -211,7 +200,6 @@ function cachePrices(today, tomorrow) {
         // For now, we'll just keep it in memory
         cachedData = cache
     } catch (e) {
-        console.log("Error caching prices:", e)
     }
 }
 

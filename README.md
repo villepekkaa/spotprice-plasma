@@ -11,7 +11,6 @@ A KDE Plasma 6 widget for displaying Finnish electricity spot prices from spot-h
   - 🟡 Yellow: 10-20 c/kWh (moderate)
   - 🔴 Red: > 20 c/kWh (expensive)
 - **Price customization**: Add margin and transfer fee to all displayed prices
-- **Centralized configuration**: All widget instances share the same settings
 - **Smart caching**: Prices cached locally to avoid API abuse
 - **Day switching**: Toggle between today and tomorrow's prices
 - **Tomorrow notification**: Shows when tomorrow's prices will be available (14:15 EET)

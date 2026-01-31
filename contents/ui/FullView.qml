@@ -29,16 +29,11 @@ Item {
     Layout.fillHeight: true
 
     Component.onCompleted: {
-        console.log("FullView completed - priceMargin:", priceMargin, "transferFee:", transferFee, "greenThreshold:", greenThreshold)
-        console.log("FullView - todayPrices count:", todayPrices.length)
-        // Set initial model
         chartRepeater.model = showingTomorrow ? tomorrowPrices : todayPrices
         refreshRequested()
     }
 
     onPriceMarginChanged: {
-        console.log("priceMargin changed:", priceMargin)
-        // Force chart to update by triggering model refresh
         if (chartRepeater.model) {
             var currentModel = chartRepeater.model
             chartRepeater.model = []
@@ -46,25 +41,19 @@ Item {
         }
     }
     onTransferFeeChanged: {
-        console.log("transferFee changed:", transferFee)
-        // Force chart to update by triggering model refresh
         if (chartRepeater.model) {
             var currentModel = chartRepeater.model
             chartRepeater.model = []
             chartRepeater.model = currentModel
         }
     }
-    onGreenThresholdChanged: console.log("greenThreshold changed:", greenThreshold)
     onTodayPricesChanged: {
-        console.log("FullView todayPrices changed - count:", todayPrices.length)
-        // Force repeater to refresh
         if (!showingTomorrow) {
             chartRepeater.model = null
             chartRepeater.model = todayPrices
         }
     }
     onTomorrowPricesChanged: {
-        console.log("FullView tomorrowPrices changed - count:", tomorrowPrices.length)
         if (showingTomorrow) {
             chartRepeater.model = null
             chartRepeater.model = tomorrowPrices
@@ -130,10 +119,8 @@ Item {
                     var totalPrice = price + margin + fee
                     if (totalPrice > max) max = totalPrice
                 }
-                console.log("maxPriceValue calculated:", max, "prices count:", prices.length, "margin:", margin, "fee:", fee)
                 return Math.max(max, 0.1)
             }
-            onMaxPriceValueChanged: console.log("maxPriceValue changed to:", maxPriceValue)
             
             Row {
                 anchors.fill: parent
@@ -146,34 +133,20 @@ Item {
                     property var currentPrices: showingTomorrow ? tomorrowPrices : todayPrices
                     model: currentPrices
                     
-                    Component.onCompleted: console.log("Chart repeater completed - model count:", model ? model.length : 0)
-                    onModelChanged: console.log("Chart repeater model changed - count:", model ? model.length : 0)
                     onCurrentPricesChanged: {
-                        console.log("currentPrices changed - updating model, count:", currentPrices.length)
                         model = currentPrices
                     }
 
                     Column {
                         id: column
                         width: parent.width / 24 - 4
-                        height: parent.height - 20 // Account for Row's topMargin
+                        height: parent.height - 20
                         spacing: 4
 
                         property int hourIndex: index
                         property real basePrice: modelData || 0
-                        // Safe property access with fallback values
                         property real displayPrice: basePrice + (FullView.priceMargin || 0) + (FullView.transferFee || 0)
                         property real maxPrice: chartArea.maxPriceValue
-
-                        Component.onCompleted: {
-                            console.log("Column", hourIndex, "maxPrice:", maxPrice, "displayPrice:", displayPrice, "ratio:", displayPrice / maxPrice)
-                        }
-
-                        onDisplayPriceChanged: {
-                            if (hourIndex === currentHour && !showingTomorrow) {
-                                console.log("Current hour price changed:", displayPrice)
-                            }
-                        }
                         
                         // Price label
                         Label {
@@ -192,7 +165,7 @@ Item {
                         Item {
                             id: barContainer
                             width: parent.width
-                            height: parent.height - 32 // 14 (price) + 14 (hour) + 4 (spacing)
+                            height: parent.height - 32
                             
                             Rectangle {
                                 anchors.bottom: parent.bottom

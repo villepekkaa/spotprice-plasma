@@ -20,10 +20,6 @@ Item {
         onClicked: parent.clicked()
     }
 
-    Component.onCompleted: {
-        console.log("CompactView completed")
-    }
-    
     Rectangle {
         anchors.fill: parent
         color: "transparent"
