@@ -98,23 +98,12 @@ function loadSettings() {
 }
 
 function saveSettings(settings) {
-    try {
-        // We can't create directories from QML, so just try to write the file
-        // User needs to create ~/.config/spotprices/ manually first time
-        var xhr = new XMLHttpRequest();
-        xhr.open("PUT", "file://" + configFile, false);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.send(JSON.stringify(settings, null, 2));
-        
-        currentSettings = deepCopy(settings);
-        console.log("Settings saved to:", configFile);
-        return true;
-    } catch (e) {
-        console.log("Failed to save settings:", e);
-        // Still update current settings in memory even if save fails
-        currentSettings = deepCopy(settings);
-        return false;
-    }
+    // Note: XMLHttpRequest PUT doesn't work for file:// URLs in QML
+    // Settings should be saved via shell command in the UI layer instead
+    // This function is kept for API compatibility but doesn't write files
+    console.log("Note: saveSettings called but file writing not supported from JS library");
+    currentSettings = deepCopy(settings);
+    return true;
 }
 
 function getSetting(key) {

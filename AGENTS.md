@@ -70,14 +70,25 @@ contents/locale/
 .
 ├── metadata.json              # Widget metadata (name, version, etc.)
 ├── contents/
+│   ├── code/
+│   │   └── priceFetcher.js    # API and caching logic
 │   ├── config/
-│   │   └── main.xml           # Configuration options
-│   ├── ui/
-│   │   ├── main.qml           # Main widget entry point
-│   │   ├── CompactView.qml    # Taskbar/compact view
-│   │   └── FullView.qml       # Desktop/full view
-│   └── code/
-│       └── priceFetcher.js    # API and caching logic
+│   │   ├── config.qml         # Config dialog entry point
+│   │   └── main.xml           # Configuration options (legacy)
+│   ├── locale/                # Compiled translation files
+│   │   ├── fi/LC_MESSAGES/spotprice.mo
+│   │   └── en/LC_MESSAGES/spotprice.mo
+│   └── ui/
+│       ├── main.qml           # Main widget entry point
+│       ├── CompactView.qml    # Taskbar/compact view
+│       ├── FullView.qml       # Desktop/full view
+│       └── ConfigGeneral.qml  # Settings dialog
+├── translations/              # Translation source files
+│   ├── fi.po
+│   ├── en.po
+│   └── spotprice.pot
+├── Messages.sh                # Script to extract translations
+├── compile_translations.sh    # Script to compile .po to .mo
 ├── README.md
 ├── LICENSE
 └── AGENTS.md (this file)
@@ -139,6 +150,7 @@ qml6 -typeinfo contents/ui/main.qml
 - [ ] Full view shows bar chart
 - [ ] Day switching works
 - [ ] Tomorrow prices show after 14:15
+- [ ] Price margin and transfer fee affect displayed prices
 - [ ] Caching works (no excessive API calls)
 - [ ] Offline mode handles gracefully
 

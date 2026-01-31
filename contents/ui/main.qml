@@ -4,17 +4,17 @@ import org.kde.plasma.plasmoid
 import org.kde.plasma.core as PlasmaCore
 import org.kde.kirigami as Kirigami
 import "../code/priceFetcher.js" as PriceFetcher
-import "../code/configManager.js" as ConfigManager
 
 PlasmoidItem {
     id: root
     
-    // Configuration properties loaded from centralized config
-    property real greenThreshold: ConfigManager.getSetting("greenThreshold")
-    property real yellowThreshold: ConfigManager.getSetting("yellowThreshold")
-    property real redThreshold: ConfigManager.getSetting("redThreshold")
-    property real priceMargin: ConfigManager.getSetting("priceMargin")
-    property real transferFee: ConfigManager.getSetting("transferFee")
+    // Configuration properties from Plasma widget configuration
+    // These are automatically saved/loaded by Plasma per-widget instance
+    property real greenThreshold: (Plasmoid.configuration.greenThreshold || 100) / 10.0
+    property real yellowThreshold: (Plasmoid.configuration.yellowThreshold || 200) / 10.0
+    property real redThreshold: (Plasmoid.configuration.redThreshold || 300) / 10.0
+    property real priceMargin: (Plasmoid.configuration.priceMargin || 0) / 100.0
+    property real transferFee: (Plasmoid.configuration.transferFee || 0) / 100.0
 
     // Watch for configuration changes
     onPriceMarginChanged: console.log("Main priceMargin changed:", priceMargin)
@@ -83,8 +83,6 @@ PlasmoidItem {
     
     Component.onCompleted: {
         console.log("Main widget completed")
-        ConfigManager.initialize()
-        reloadSettings()
         console.log("Settings - priceMargin:", priceMargin, "transferFee:", transferFee)
         console.log("Settings - greenThreshold:", greenThreshold, "yellowThreshold:", yellowThreshold, "redThreshold:", redThreshold)
         PriceFetcher.initialize()
@@ -93,34 +91,6 @@ PlasmoidItem {
 
         // Set up timer to update at next 14:15
         scheduleNextUpdate()
-    }
-    
-    // Reload settings from centralized config
-    function reloadSettings() {
-        greenThreshold = ConfigManager.getSetting("greenThreshold")
-        yellowThreshold = ConfigManager.getSetting("yellowThreshold")
-        redThreshold = ConfigManager.getSetting("redThreshold")
-        priceMargin = ConfigManager.getSetting("priceMargin")
-        transferFee = ConfigManager.getSetting("transferFee")
-        console.log("Settings reloaded from centralized config")
-    }
-    
-    // Timer to check for config file changes (every 2 seconds)
-    Timer {
-        id: configCheckTimer
-        interval: 2000
-        repeat: true
-        running: true
-        property var lastConfigHash: ""
-        onTriggered: {
-            var settings = ConfigManager.loadSettings()
-            var configHash = JSON.stringify(settings)
-            if (configHash !== lastConfigHash) {
-                lastConfigHash = configHash
-                console.log("Config file changed, reloading...")
-                root.reloadSettings()
-            }
-        }
     }
     
     Timer {

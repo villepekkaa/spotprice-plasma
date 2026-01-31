@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
-import "../code/configManager.js" as ConfigManager
 
 ColumnLayout {
     id: page
@@ -15,17 +14,23 @@ ColumnLayout {
     // Tab title (required by Plasma config system)
     property string title: i18n("General")
     
-    // Dummy cfg_ properties required by Plasma config system
-    // These are not used but must exist for compatibility
-    property int cfg_greenThreshold: 100
-    property int cfg_yellowThreshold: 200
-    property int cfg_redThreshold: 300
-    property int cfg_priceMargin: 0
-    property int cfg_transferFee: 0
+    // Properties with cfg_ prefix for configuration binding
+    property alias cfg_greenThreshold: greenThresholdSpin.value
+    property alias cfg_yellowThreshold: yellowThresholdSpin.value
+    property alias cfg_redThreshold: redThresholdSpin.value
+    property alias cfg_priceMargin: priceMarginSpin.value
+    property alias cfg_transferFee: transferFeeSpin.value
     
-    // Page header - left aligned like About page title
+    // Default values (required by Plasma config system)
+    property int cfg_greenThresholdDefault: 100
+    property int cfg_yellowThresholdDefault: 200
+    property int cfg_redThresholdDefault: 300
+    property int cfg_priceMarginDefault: 0
+    property int cfg_transferFeeDefault: 0
+    
+    // Page header
     Label {
-        text: i18n("General Settings (Shared)")
+        text: i18n("General Settings")
         font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 1.2
         Layout.fillWidth: true
         Layout.leftMargin: Kirigami.Units.largeSpacing
@@ -57,15 +62,11 @@ ColumnLayout {
                 from: 0
                 to: 1000
                 stepSize: 1
-                value: Math.round(ConfigManager.getSetting("greenThreshold") * 10)
                 textFromValue: function(value, locale) {
                     return (value / 10).toFixed(1)
                 }
                 valueFromText: function(text, locale) {
                     return Math.round(parseFloat(text) * 10)
-                }
-                onValueModified: {
-                    ConfigManager.setSetting("greenThreshold", value / 10)
                 }
             }
             
@@ -75,15 +76,11 @@ ColumnLayout {
                 from: 0
                 to: 1000
                 stepSize: 1
-                value: Math.round(ConfigManager.getSetting("yellowThreshold") * 10)
                 textFromValue: function(value, locale) {
                     return (value / 10).toFixed(1)
                 }
                 valueFromText: function(text, locale) {
                     return Math.round(parseFloat(text) * 10)
-                }
-                onValueModified: {
-                    ConfigManager.setSetting("yellowThreshold", value / 10)
                 }
             }
             
@@ -93,15 +90,11 @@ ColumnLayout {
                 from: 0
                 to: 1000
                 stepSize: 1
-                value: Math.round(ConfigManager.getSetting("redThreshold") * 10)
                 textFromValue: function(value, locale) {
                     return (value / 10).toFixed(1)
                 }
                 valueFromText: function(text, locale) {
                     return Math.round(parseFloat(text) * 10)
-                }
-                onValueModified: {
-                    ConfigManager.setSetting("redThreshold", value / 10)
                 }
             }
             
@@ -118,15 +111,11 @@ ColumnLayout {
                 from: 0
                 to: 10000
                 stepSize: 1
-                value: Math.round(ConfigManager.getSetting("priceMargin") * 100)
                 textFromValue: function(value, locale) {
                     return (value / 100).toFixed(2)
                 }
                 valueFromText: function(text, locale) {
                     return Math.round(parseFloat(text) * 100)
-                }
-                onValueModified: {
-                    ConfigManager.setSetting("priceMargin", value / 100)
                 }
             }
             
@@ -149,15 +138,11 @@ ColumnLayout {
                 from: 0
                 to: 10000
                 stepSize: 1
-                value: Math.round(ConfigManager.getSetting("transferFee") * 100)
                 textFromValue: function(value, locale) {
                     return (value / 100).toFixed(2)
                 }
                 valueFromText: function(text, locale) {
                     return Math.round(parseFloat(text) * 100)
-                }
-                onValueModified: {
-                    ConfigManager.setSetting("transferFee", value / 100)
                 }
             }
             
