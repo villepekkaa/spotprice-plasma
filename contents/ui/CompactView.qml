@@ -13,7 +13,7 @@ Item {
     
     Rectangle {
         anchors.fill: parent
-        color: priceColor
+        color: "transparent"
         radius: 4
         
         ColumnLayout {
@@ -24,7 +24,7 @@ Item {
                 text: "⚡"
                 font.pixelSize: 14
                 horizontalAlignment: Text.AlignHCenter
-                color: "white"
+                color: Kirigami.Theme.textColor
             }
             
             Label {
@@ -32,7 +32,7 @@ Item {
                 font.pixelSize: 12
                 font.bold: true
                 horizontalAlignment: Text.AlignHCenter
-                color: "white"
+                color: Kirigami.Theme.textColor
             }
         }
     }
