@@ -37,7 +37,7 @@ Item {
             
             Label {
                 text: (price < 1 ? price.toFixed(2) : price.toFixed(1)) + " c/kWh"
-                font.pixelSize: 13
+                font.pixelSize: 14
                 font.weight: Font.Medium
                 color: Kirigami.Theme.textColor
             }

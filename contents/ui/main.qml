@@ -112,9 +112,8 @@ PlasmoidItem {
     
     function updateCurrentPrice() {
         var currentHour = new Date().getHours()
-        var prices = root.showingTomorrow && root.tomorrowAvailable 
-            ? root.tomorrowPrices 
-            : root.todayPrices
+        // Compact view always shows today's current hour price
+        var prices = root.todayPrices
         
         if (prices.length > currentHour) {
             root.currentPrice = prices[currentHour]
