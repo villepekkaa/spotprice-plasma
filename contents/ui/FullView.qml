@@ -148,7 +148,13 @@ Item {
                                 anchors.bottom: parent.bottom
                                 width: parent.width
                                 height: Math.min(parent.height - 2, Math.max(2, parent.height * (column.displayPrice / Math.max(column.maxPrice, 0.1))))
-                                color: column.displayPrice < greenThreshold ? "#4CAF50" : column.displayPrice <= yellowThreshold ? "#FFC107" : "#F44336"
+                                color: {
+                                    if (hourIndex === currentHour && !showingTomorrow) {
+                                        // Current hour bar - use Plasma accent/highlight color
+                                        return Kirigami.Theme.highlightColor
+                                    }
+                                    return column.displayPrice < greenThreshold ? "#4CAF50" : column.displayPrice <= yellowThreshold ? "#FFC107" : "#F44336"
+                                }
                                 radius: 2
                                 border.width: hourIndex === currentHour && !showingTomorrow ? 2 : 0
                                 border.color: Kirigami.Theme.highlightColor
