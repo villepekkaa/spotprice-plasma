@@ -27,6 +27,10 @@ ColumnLayout {
     property int cfg_redThresholdDefault: 300
     property int cfg_priceMarginDefault: 0
     property int cfg_transferFeeDefault: 0
+    property bool cfg_showTitleDefault: true
+    
+    // Dummy property to satisfy Plasma config requirements
+    property bool cfg_showTitle: true
     
     // Page header
     Label {
