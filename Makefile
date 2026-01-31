@@ -15,13 +15,15 @@ all:
 
 install:
 	@echo "Installing SpotPrice widget..."
-	kpackagetool6 --install . 2>/dev/null || kpackagetool6 --upgrade .
+	@mkdir -p $(INSTALL_DIR)
+	@cp -r contents metadata.json LICENSE README.md AGENTS.md $(INSTALL_DIR)/
+	@echo "Widget files copied to $(INSTALL_DIR)"
 	@echo "Installation complete!"
 	@echo "Run 'make restart' to reload Plasma, or add the widget manually."
 
 uninstall:
 	@echo "Uninstalling SpotPrice widget..."
-	kpackagetool6 --remove $(WIDGET_ID)
+	@rm -rf $(INSTALL_DIR)
 	@echo "Uninstall complete!"
 
 restart:
