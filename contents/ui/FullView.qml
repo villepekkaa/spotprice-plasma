@@ -19,12 +19,12 @@ Item {
     signal toggleDay()
     signal refreshRequested()
 
-    implicitWidth: 400
-    implicitHeight: 280
-    Layout.minimumWidth: 320
-    Layout.minimumHeight: 200
-    Layout.preferredWidth: 400
-    Layout.preferredHeight: 280
+    implicitWidth: 600
+    implicitHeight: 400
+    Layout.minimumWidth: 400
+    Layout.minimumHeight: 280
+    Layout.preferredWidth: 600
+    Layout.preferredHeight: 400
     Layout.fillWidth: true
     Layout.fillHeight: true
 
