@@ -21,9 +21,6 @@
         <entry name="transferFee" type="Int">
             <default>0</default>
         </entry>
-        <entry name="showTitle" type="Bool">
-            <default>true</default>
-        </entry>
     </group>
 
 </kcfg>

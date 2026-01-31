@@ -11,43 +11,88 @@ A KDE Plasma 6 widget for displaying Finnish electricity spot prices from spot-h
   - 🟡 Yellow: 10-20 c/kWh (moderate)
   - 🔴 Red: > 20 c/kWh (expensive)
 - **Price customization**: Add margin and transfer fee to all displayed prices
-- **Centralized configuration**: All widget instances share the same settings
 - **Smart caching**: Prices cached locally to avoid API abuse
 - **Day switching**: Toggle between today and tomorrow's prices
 - **Tomorrow notification**: Shows when tomorrow's prices will be available (14:15 EET)
 
 ## Installation
 
-### From Source
+### Method 1: Using Makefile (Recommended)
 
-1. Clone the repository:
+Simple and reliable - copies files to the correct location:
+
 ```bash
+# Clone the repository
 git clone https://github.com/villepekkaa/spotprices.git
 cd spotprices
+
+# Install the widget
+make install
+
+# If updating an existing installation, the same command works:
+make install
 ```
 
-2. Copy to Plasma widgets directory (excluding .git):
+### Method 2: Using kpackagetool6 (KDE Official Tool)
+
+KDE's standard package management tool:
+
 ```bash
+# Clone the repository
+git clone https://github.com/villepekkaa/spotprices.git
+cd spotprices
+
+# Install the widget globally
+kpackagetool6 --global --install .
+
+# Or if updating:
+kpackagetool6 --global --upgrade .
+```
+
+### Method 3: Manual Installation
+
+If you prefer to do it manually:
+
+```bash
+# Create the widget directory
 mkdir -p ~/.local/share/plasma/plasmoids/com.villepekkaa.spotprice
+
+# Copy the files
 cp -r contents metadata.json LICENSE README.md AGENTS.md ~/.local/share/plasma/plasmoids/com.villepekkaa.spotprice/
 ```
 
-3. Restart Plasma or run:
-```bash
-kpackagetool6 --upgrade ~/.local/share/plasma/plasmoids/com.villepekkaa.spotprice
-```
+### After Installation
 
-Alternative restart methods:
+Restart Plasma to apply changes:
+
 ```bash
+# Using make:
+make restart
+
+# Or manually:
 kquitapp6 plasmashell && kstart plasmashell
-# or
-plasmashell --replace
 ```
 
-4. Add widget to your desktop or panel:
-   - Right-click on desktop/panel → Add Widgets
-   - Search for "SpotPrice"
+Then add the widget:
+   - Right-click on desktop/panel → **Add Widgets**
+   - Search for **"SpotPrice"**
    - Drag to desired location
+
+### Uninstallation
+
+```bash
+# Using make:
+make uninstall
+
+# Or manually remove:
+rm -rf ~/.local/share/plasma/plasmoids/com.villepekkaa.spotprice
+```
+
+### Future: KDE Store (Discover/GHNS)
+
+Once published to [KDE Store](https://store.kde.org), install directly through:
+- **Discover** (Software Center) → Plasma Addons
+- **Plasma Widget Explorer** → Get New Widgets → Download New Plasma Widgets
 
 ## Usage
 

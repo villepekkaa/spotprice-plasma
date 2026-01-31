@@ -27,11 +27,15 @@ ColumnLayout {
     property int cfg_redThresholdDefault: 300
     property int cfg_priceMarginDefault: 0
     property int cfg_transferFeeDefault: 0
+    property bool cfg_showTitleDefault: true
+    
+    // Dummy property to satisfy Plasma config requirements
+    property bool cfg_showTitle: true
     
     // Page header
     Label {
         text: i18n("General Settings")
-        font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 1.2
+        font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 1.5
         Layout.fillWidth: true
         Layout.leftMargin: Kirigami.Units.largeSpacing
         Layout.topMargin: Kirigami.Units.largeSpacing * 2
