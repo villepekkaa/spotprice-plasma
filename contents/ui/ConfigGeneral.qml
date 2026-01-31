@@ -35,7 +35,7 @@ ColumnLayout {
     // Page header
     Label {
         text: i18n("General Settings")
-        font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 1.2
+        font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 1.5
         Layout.fillWidth: true
         Layout.leftMargin: Kirigami.Units.largeSpacing
         Layout.topMargin: Kirigami.Units.largeSpacing * 2
