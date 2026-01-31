@@ -27,32 +27,19 @@ Item {
     Layout.preferredHeight: 400
 
     Component.onCompleted: {
-        chartRepeater.model = showingTomorrow ? tomorrowPrices : todayPrices
         refreshRequested()
     }
 
-    onPriceMarginChanged: Qt.callLater(refreshChart)
-    onTransferFeeChanged: Qt.callLater(refreshChart)
-    
-    function refreshChart() {
-        // Force re-evaluation of chart by triggering property bindings
+    // Computed prices with margin/fee applied - updates automatically when margin/fee changes
+    property var computedPrices: {
         var prices = showingTomorrow ? tomorrowPrices : todayPrices
-        if (prices && prices.length > 0) {
-            chartRepeater.model = null
-            chartRepeater.model = prices
+        var margin = priceMargin || 0
+        var fee = transferFee || 0
+        var result = []
+        for (var i = 0; i < prices.length; i++) {
+            result.push((prices[i] || 0) + margin + fee)
         }
-    }
-    onTodayPricesChanged: {
-        if (!showingTomorrow) {
-            chartRepeater.model = null
-            chartRepeater.model = todayPrices
-        }
-    }
-    onTomorrowPricesChanged: {
-        if (showingTomorrow) {
-            chartRepeater.model = null
-            chartRepeater.model = tomorrowPrices
-        }
+        return result
     }
     
     ColumnLayout {
@@ -124,13 +111,8 @@ Item {
                 
                 Repeater {
                     id: chartRepeater
-                    // Simple model without conditional
-                    property var currentPrices: showingTomorrow ? tomorrowPrices : todayPrices
-                    model: currentPrices
-                    
-                    onCurrentPricesChanged: {
-                        model = currentPrices
-                    }
+                    // Use computedPrices which includes margin/fee - updates automatically
+                    model: computedPrices
 
                     Column {
                         id: column
@@ -139,8 +121,8 @@ Item {
                         spacing: 4
 
                         property int hourIndex: index
-                        property real basePrice: modelData || 0
-                        property real displayPrice: basePrice + (FullView.priceMargin || 0) + (FullView.transferFee || 0)
+                        // modelData is already the computed price with margin/fee
+                        property real displayPrice: modelData || 0
                         property real maxPrice: chartArea.maxPriceValue
                         
                         // Price label
@@ -151,9 +133,9 @@ Item {
                             font.pixelSize: 9
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
-                            visible: parent.displayPrice > 0
-                            font.bold: index === currentHour && !showingTomorrow
-                            color: index === currentHour && !showingTomorrow ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                            visible: true
+                            font.bold: hourIndex === currentHour && !showingTomorrow
+                            color: hourIndex === currentHour && !showingTomorrow ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                         }
                         
                         // Bar area
@@ -168,7 +150,7 @@ Item {
                                 height: Math.min(parent.height - 2, Math.max(2, parent.height * (column.displayPrice / Math.max(column.maxPrice, 0.1))))
                                 color: column.displayPrice < greenThreshold ? "#4CAF50" : column.displayPrice <= yellowThreshold ? "#FFC107" : "#F44336"
                                 radius: 2
-                                border.width: index === currentHour && !showingTomorrow ? 2 : 0
+                                border.width: hourIndex === currentHour && !showingTomorrow ? 2 : 0
                                 border.color: Kirigami.Theme.highlightColor
                             }
                         }
@@ -177,12 +159,12 @@ Item {
                         Label {
                             width: parent.width
                             height: 14
-                            text: index
+                            text: hourIndex
                             font.pixelSize: 9
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
-                            font.bold: index === currentHour && !showingTomorrow
-                            color: index === currentHour && !showingTomorrow ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                            font.bold: hourIndex === currentHour && !showingTomorrow
+                            color: hourIndex === currentHour && !showingTomorrow ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                         }
                     }
                 }

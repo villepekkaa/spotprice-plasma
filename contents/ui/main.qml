@@ -51,6 +51,7 @@ PlasmoidItem {
     
     // Full representation (desktop/panel popup view)
     fullRepresentation: FullView {
+        id: fullView
         todayPrices: root.todayPrices
         tomorrowPrices: root.tomorrowPrices
         showingTomorrow: root.showingTomorrow
@@ -103,6 +104,10 @@ PlasmoidItem {
             }
         }
     }
+    
+    // Monitor configuration changes and update both views
+    onPriceMarginChanged: Qt.callLater(updateCurrentPrice)
+    onTransferFeeChanged: Qt.callLater(updateCurrentPrice)
     
     function scheduleNextUpdate() {
         var msUntil1415 = PriceFetcher.getMsUntil1415()
