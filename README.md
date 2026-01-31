@@ -23,8 +23,8 @@ Simple and reliable - copies files to the correct location:
 
 ```bash
 # Clone the repository
-git clone https://github.com/villepekkaa/spotprices.git
-cd spotprices
+git clone https://github.com/villepekkaa/spotprice-plasma.git
+cd spotprice-plasma
 
 # Install the widget
 make install
@@ -39,8 +39,8 @@ KDE's standard package management tool:
 
 ```bash
 # Clone the repository
-git clone https://github.com/villepekkaa/spotprices.git
-cd spotprices
+git clone https://github.com/villepekkaa/spotprice-plasma.git
+cd spotprice-plasma
 
 # Install the widget globally
 kpackagetool6 --global --install .

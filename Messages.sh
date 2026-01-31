@@ -24,7 +24,7 @@ cat > "$POT_FILE" << EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: spotprice-widget 1.0.0\\n"
-"Report-Msgid-Bugs-To: https://github.com/villepekkaa/spotprices-plasma/issues\\n"
+"Report-Msgid-Bugs-To: https://github.com/villepekkaa/spotprice-plasma/issues\\n"
 "POT-Creation-Date: $(date +%Y-%m-%d\ %H:%M%z)\\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n"
