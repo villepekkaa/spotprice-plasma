@@ -1,10 +1,10 @@
 // PriceFetcher - Handles API calls and caching for spot-hinta.fi
 // This module fetches electricity prices and caches them locally
+// Update logic: Fetch on startup if no cache, then at 14:15 daily when tomorrow prices become available
 
 var plasmoid = null
 var cacheDir = ""
-var lastFetchTime = 0
-var CACHE_DURATION = 3600000 // 1 hour in milliseconds
+var cachedData = null
 
 function initialize(plasmoidRef) {
     plasmoid = plasmoidRef
@@ -12,19 +12,40 @@ function initialize(plasmoidRef) {
 }
 
 function fetchPrices(callback) {
-    var now = Date.now()
+    var cached = loadCachedPrices()
+    var now = new Date()
+    var currentHour = now.getHours()
+    var currentMinute = now.getMinutes()
     
-    // Check if we have cached data that's still fresh
-    if (now - lastFetchTime < CACHE_DURATION) {
-        var cached = loadCachedPrices()
-        if (cached.today.length > 0) {
-            callback(cached.today, cached.tomorrow)
-            return
-        }
+    // Check if we have today's data in cache
+    var todayDateStr = formatDate(now)
+    var hasTodayData = cached.today.length > 0 && isSameDay(cached.date, todayDateStr)
+    
+    // Always fetch if no today's data in cache
+    if (!hasTodayData) {
+        console.log("Fetching prices: no today's data in cache")
+        fetchFromAPI(callback)
+        return
     }
     
-    // Fetch fresh data from API
-    fetchFromAPI(callback)
+    // If it's after 14:15 and we don't have tomorrow's data, fetch
+    var isAfter1415 = currentHour > 14 || (currentHour === 14 && currentMinute >= 15)
+    var hasTomorrowData = cached.tomorrow.length > 0
+    
+    if (isAfter1415 && !hasTomorrowData) {
+        console.log("Fetching prices: after 14:15, no tomorrow data")
+        fetchFromAPI(callback)
+        return
+    }
+    
+    // Use cached data
+    console.log("Using cached prices")
+    callback(cached.today, cached.tomorrow)
+}
+
+function isSameDay(dateStr1, dateStr2) {
+    if (!dateStr1) return false
+    return dateStr1 === dateStr2
 }
 
 function fetchFromAPI(callback) {
@@ -130,7 +151,9 @@ function formatDate(date) {
 
 function cachePrices(today, tomorrow) {
     try {
+        var now = new Date()
         var cache = {
+            date: formatDate(now),
             timestamp: Date.now(),
             today: today,
             tomorrow: tomorrow
@@ -143,11 +166,30 @@ function cachePrices(today, tomorrow) {
     }
 }
 
-var cachedData = null
-
 function loadCachedPrices() {
-    if (cachedData && (Date.now() - cachedData.timestamp) < CACHE_DURATION) {
+    if (cachedData && cachedData.date) {
         return cachedData
     }
-    return { today: [], tomorrow: [] }
+    return { date: null, today: [], tomorrow: [] }
+}
+
+// Get milliseconds until next 14:15
+function getMsUntil1415() {
+    var now = new Date()
+    var target = new Date()
+    target.setHours(14, 15, 0, 0)
+    
+    // If it's already past 14:15 today, target tomorrow
+    if (now > target) {
+        target.setDate(target.getDate() + 1)
+    }
+    
+    return target - now
+}
+
+// Get the time when tomorrow's prices become available
+function getNextUpdateTime() {
+    var msUntil1415 = getMsUntil1415()
+    var nextUpdate = new Date(Date.now() + msUntil1415)
+    return nextUpdate.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' })
 }

@@ -31,19 +31,37 @@ PlasmoidItem {
         onToggleDay: root.toggleDay()
     }
     
+    // Property for next update time display
+    property string nextUpdateTime: ""
+    
     Component.onCompleted: {
         PriceFetcher.initialize(Plasmoid)
         refreshData()
         
-        // Set up timer to refresh every hour
-        refreshTimer.start()
+        // Set up timer to update at next 14:15
+        scheduleNextUpdate()
     }
     
     Timer {
         id: refreshTimer
-        interval: 3600000 // 1 hour in milliseconds
-        repeat: true
-        onTriggered: refreshData()
+        interval: 0
+        repeat: false
+        onTriggered: {
+            refreshData()
+            // After first update at 14:15, schedule next one for tomorrow
+            scheduleNextUpdate()
+        }
+    }
+    
+    function scheduleNextUpdate() {
+        var msUntil1415 = PriceFetcher.getMsUntil1415()
+        refreshTimer.interval = msUntil1415
+        refreshTimer.start()
+        
+        // Update display
+        var nextUpdate = new Date(Date.now() + msUntil1415)
+        root.nextUpdateTime = nextUpdate.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' })
+        console.log("Next price update scheduled at:", root.nextUpdateTime)
     }
     
     function refreshData() {

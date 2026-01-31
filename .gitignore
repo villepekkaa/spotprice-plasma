@@ -1,0 +1,17 @@
+# Cache files
+*.cache
+cache/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test installations
+*.local/share/plasma/plasmoids/
