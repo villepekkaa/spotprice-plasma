@@ -11,14 +11,65 @@ Item {
     property bool showingTomorrow: false
     property bool tomorrowAvailable: false
     property int currentHour: 0
+    property real priceMargin: 0.0
+    property real transferFee: 0.0
+    property real greenThreshold: 10.0
+    property real yellowThreshold: 20.0
+    property real redThreshold: 30.0
     signal toggleDay()
-    
-    implicitWidth: 600
-    implicitHeight: 350
-    Layout.minimumWidth: 500
-    Layout.minimumHeight: 250
-    Layout.preferredWidth: 600
-    Layout.preferredHeight: 350
+    signal refreshRequested()
+
+    implicitWidth: 400
+    implicitHeight: 280
+    Layout.minimumWidth: 320
+    Layout.minimumHeight: 200
+    Layout.preferredWidth: 400
+    Layout.preferredHeight: 280
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+
+    Component.onCompleted: {
+        console.log("FullView completed - priceMargin:", priceMargin, "transferFee:", transferFee, "greenThreshold:", greenThreshold)
+        console.log("FullView - todayPrices count:", todayPrices.length)
+        // Set initial model
+        chartRepeater.model = showingTomorrow ? tomorrowPrices : todayPrices
+        refreshRequested()
+    }
+
+    onPriceMarginChanged: {
+        console.log("priceMargin changed:", priceMargin)
+        // Force chart to update by triggering model refresh
+        if (chartRepeater.model) {
+            var currentModel = chartRepeater.model
+            chartRepeater.model = []
+            chartRepeater.model = currentModel
+        }
+    }
+    onTransferFeeChanged: {
+        console.log("transferFee changed:", transferFee)
+        // Force chart to update by triggering model refresh
+        if (chartRepeater.model) {
+            var currentModel = chartRepeater.model
+            chartRepeater.model = []
+            chartRepeater.model = currentModel
+        }
+    }
+    onGreenThresholdChanged: console.log("greenThreshold changed:", greenThreshold)
+    onTodayPricesChanged: {
+        console.log("FullView todayPrices changed - count:", todayPrices.length)
+        // Force repeater to refresh
+        if (!showingTomorrow) {
+            chartRepeater.model = null
+            chartRepeater.model = todayPrices
+        }
+    }
+    onTomorrowPricesChanged: {
+        console.log("FullView tomorrowPrices changed - count:", tomorrowPrices.length)
+        if (showingTomorrow) {
+            chartRepeater.model = null
+            chartRepeater.model = tomorrowPrices
+        }
+    }
     
     ColumnLayout {
         anchors.fill: parent
@@ -30,15 +81,15 @@ Item {
             Layout.fillWidth: true
             
             Label {
-                text: showingTomorrow ? "Huomenna" : "Tänään"
+                text: showingTomorrow ? i18n("Tomorrow") : i18n("Today")
                 font.pixelSize: 18
                 font.bold: true
             }
-            
+
             Item { Layout.fillWidth: true }
-            
+
             PlasmaComponents.Button {
-                text: showingTomorrow ? "Tänään" : "Huomenna"
+                text: showingTomorrow ? i18n("Today") : i18n("Tomorrow")
                 enabled: true
                 opacity: tomorrowAvailable || showingTomorrow ? 1.0 : 0.5
                 onClicked: toggleDay()
@@ -53,7 +104,7 @@ Item {
             
             Label {
                 anchors.centerIn: parent
-                text: "Huomisen hinnat saatavilla noin klo 14:15"
+                text: i18n("Tomorrow's prices available around 14:15")
                 font.pixelSize: 14
                 color: Kirigami.Theme.textColor
                 font.italic: true
@@ -63,19 +114,26 @@ Item {
         
         // Price chart
         Item {
+            id: chartArea
             Layout.fillWidth: true
             Layout.fillHeight: true
             visible: !showingTomorrow || tomorrowAvailable
             
-            // Store maxPrice as a property accessible to children
+            // Store maxPrice as a property accessible to children (with margin and fee)
             property real maxPriceValue: {
                 var prices = showingTomorrow ? tomorrowPrices : todayPrices
                 var max = 0
+                var margin = FullView.priceMargin || 0
+                var fee = FullView.transferFee || 0
                 for (var i = 0; i < prices.length; i++) {
-                    if (prices[i] > max) max = prices[i]
+                    var price = prices[i] || 0
+                    var totalPrice = price + margin + fee
+                    if (totalPrice > max) max = totalPrice
                 }
-                return Math.max(max, 1)
+                console.log("maxPriceValue calculated:", max, "prices count:", prices.length, "margin:", margin, "fee:", fee)
+                return Math.max(max, 0.1)
             }
+            onMaxPriceValueChanged: console.log("maxPriceValue changed to:", maxPriceValue)
             
             Row {
                 anchors.fill: parent
@@ -83,34 +141,64 @@ Item {
                 spacing: 4
                 
                 Repeater {
-                    model: showingTomorrow ? tomorrowPrices : todayPrices
+                    id: chartRepeater
+                    // Simple model without conditional
+                    property var currentPrices: showingTomorrow ? tomorrowPrices : todayPrices
+                    model: currentPrices
                     
+                    Component.onCompleted: console.log("Chart repeater completed - model count:", model ? model.length : 0)
+                    onModelChanged: console.log("Chart repeater model changed - count:", model ? model.length : 0)
+                    onCurrentPricesChanged: {
+                        console.log("currentPrices changed - updating model, count:", currentPrices.length)
+                        model = currentPrices
+                    }
+
                     Column {
+                        id: column
                         width: parent.width / 24 - 4
-                        height: parent.height
+                        height: parent.height - 20 // Account for Row's topMargin
                         spacing: 4
+
+                        property int hourIndex: index
+                        property real basePrice: modelData || 0
+                        // Safe property access with fallback values
+                        property real displayPrice: basePrice + (FullView.priceMargin || 0) + (FullView.transferFee || 0)
+                        property real maxPrice: chartArea.maxPriceValue
+
+                        Component.onCompleted: {
+                            console.log("Column", hourIndex, "maxPrice:", maxPrice, "displayPrice:", displayPrice, "ratio:", displayPrice / maxPrice)
+                        }
+
+                        onDisplayPriceChanged: {
+                            if (hourIndex === currentHour && !showingTomorrow) {
+                                console.log("Current hour price changed:", displayPrice)
+                            }
+                        }
                         
                         // Price label
                         Label {
                             width: parent.width
-                            text: modelData.toFixed(1)
+                            height: 14
+                            text: parent.displayPrice.toFixed(1)
                             font.pixelSize: 9
                             horizontalAlignment: Text.AlignHCenter
-                            visible: modelData > 0
+                            verticalAlignment: Text.AlignVCenter
+                            visible: parent.displayPrice > 0
                             font.bold: index === currentHour && !showingTomorrow
                             color: index === currentHour && !showingTomorrow ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                         }
                         
                         // Bar area
                         Item {
+                            id: barContainer
                             width: parent.width
-                            height: parent.height - 35
+                            height: parent.height - 32 // 14 (price) + 14 (hour) + 4 (spacing)
                             
                             Rectangle {
                                 anchors.bottom: parent.bottom
                                 width: parent.width
-                                height: parent.height * (modelData / parent.parent.parent.parent.maxPriceValue)
-                                color: modelData < 10 ? "#4CAF50" : modelData <= 20 ? "#FFC107" : "#F44336"
+                                height: Math.min(parent.height - 2, Math.max(2, parent.height * (column.displayPrice / Math.max(column.maxPrice, 0.1))))
+                                color: column.displayPrice < greenThreshold ? "#4CAF50" : column.displayPrice <= yellowThreshold ? "#FFC107" : "#F44336"
                                 radius: 2
                                 border.width: index === currentHour && !showingTomorrow ? 2 : 0
                                 border.color: Kirigami.Theme.highlightColor
@@ -120,9 +208,11 @@ Item {
                         // Hour label
                         Label {
                             width: parent.width
+                            height: 14
                             text: index
                             font.pixelSize: 9
                             horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
                             font.bold: index === currentHour && !showingTomorrow
                             color: index === currentHour && !showingTomorrow ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                         }
@@ -146,7 +236,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Label {
-                    text: "< 10c"
+                    text: "< " + greenThreshold + "c"
                     font.pixelSize: 11
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -162,7 +252,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Label {
-                    text: "10-20c"
+                    text: greenThreshold + "-" + yellowThreshold + "c"
                     font.pixelSize: 11
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -178,7 +268,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Label {
-                    text: "> 20c"
+                    text: "> " + yellowThreshold + "c"
                     font.pixelSize: 11
                     anchors.verticalCenter: parent.verticalCenter
                 }

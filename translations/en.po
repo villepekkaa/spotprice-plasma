@@ -1,0 +1,77 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: spotprice-widget\n"
+"Report-Msgid-Bugs-To: https://github.com/villepekkaa/spotprices-plasma/issues\n"
+"POT-Creation-Date: 2026-01-31 12:00+0200\n"
+"PO-Revision-Date: 2026-01-31 12:00+0200\n"
+"Last-Translator: Ville-Pekka Alavuotunki\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: contents/ui/FullView.qml:37
+msgid "Today"
+msgstr "Today"
+
+#: contents/ui/FullView.qml:45
+msgid "Tomorrow"
+msgstr "Tomorrow"
+
+#: contents/ui/FullView.qml:60
+msgid "Tomorrow's prices available around 14:15"
+msgstr "Tomorrow's prices available around 14:15"
+
+#: contents/ui/CompactView.qml:39
+msgid "c/kWh"
+msgstr "c/kWh"
+
+#: contents/ui/ConfigGeneral.qml:35
+msgid "Settings"
+msgstr "Settings"
+
+#: contents/ui/ConfigGeneral.qml:14 contents/config/config.qml:6
+msgid "General"
+msgstr "General"
+
+#: contents/ui/ConfigGeneral.qml:30
+msgid "Price Thresholds (c/kWh)"
+msgstr "Price Thresholds (c/kWh)"
+
+#: contents/ui/ConfigGeneral.qml:37
+msgid "Green threshold:"
+msgstr "Green threshold:"
+
+#: contents/ui/ConfigGeneral.qml:51
+msgid "Yellow threshold:"
+msgstr "Yellow threshold:"
+
+#: contents/ui/ConfigGeneral.qml:65
+msgid "Red threshold:"
+msgstr "Red threshold:"
+
+#: contents/ui/ConfigGeneral.qml:79
+msgid "Price Margin"
+msgstr "Price Margin"
+
+#: contents/ui/ConfigGeneral.qml:86
+msgid "Margin (c/kWh):"
+msgstr "Margin (c/kWh):"
+
+#: contents/ui/ConfigGeneral.qml:99
+msgid "This margin is added to all displayed prices"
+msgstr "This margin is added to all displayed prices"
+
+#: contents/ui/ConfigGeneral.qml:104
+msgid "Transfer Fee"
+msgstr "Transfer Fee"
+
+#: contents/ui/ConfigGeneral.qml:110
+msgid "Transfer fee (c/kWh):"
+msgstr "Transfer fee (c/kWh):"
+
+#: contents/ui/ConfigGeneral.qml:121
+msgid "This transfer fee is added to all displayed prices"
+msgstr "This transfer fee is added to all displayed prices"

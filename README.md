@@ -73,7 +73,7 @@ MIT License - See LICENSE file
 
 ## Author
 
-villepekkaa
+Ville-Pekka Alavuotunki
 
 ## Contributing
 

@@ -15,7 +15,8 @@
         "Name": "SpotPrice",
         "Version": "1.0.0",
         "License": "MIT",
-        "Website": "https://github.com/villepekkaa/spotprices-plasma"
+        "Website": "https://github.com/villepekkaa/spotprices-plasma",
+        "EnabledByDefault": true
     },
     "X-Plasma-API-Minimum-Version": "6.0"
 }

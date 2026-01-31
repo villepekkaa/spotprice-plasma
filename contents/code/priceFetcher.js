@@ -237,8 +237,8 @@ function getMsUntil1415() {
 }
 
 // Get the time when tomorrow's prices become available
-function getNextUpdateTime() {
+function getNextUpdateTime(locale) {
     var msUntil1415 = getMsUntil1415()
     var nextUpdate = new Date(Date.now() + msUntil1415)
-    return nextUpdate.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' })
+    return nextUpdate.toLocaleTimeString(locale || 'fi-FI', { hour: '2-digit', minute: '2-digit' })
 }

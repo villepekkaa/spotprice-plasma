@@ -1,0 +1,77 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: spotprice-widget\n"
+"Report-Msgid-Bugs-To: https://github.com/villepekkaa/spotprices-plasma/issues\n"
+"POT-Creation-Date: 2026-01-31 12:00+0200\n"
+"PO-Revision-Date: 2026-01-31 12:00+0200\n"
+"Last-Translator: Ville-Pekka Alavuotunki\n"
+"Language-Team: Finnish\n"
+"Language: fi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: contents/ui/FullView.qml:37
+msgid "Today"
+msgstr "Tänään"
+
+#: contents/ui/FullView.qml:45
+msgid "Tomorrow"
+msgstr "Huomenna"
+
+#: contents/ui/FullView.qml:60
+msgid "Tomorrow's prices available around 14:15"
+msgstr "Huomisen hinnat saatavilla noin klo 14:15"
+
+#: contents/ui/CompactView.qml:39
+msgid "c/kWh"
+msgstr "c/kWh"
+
+#: contents/ui/ConfigGeneral.qml:35
+msgid "Settings"
+msgstr "Asetukset"
+
+#: contents/ui/ConfigGeneral.qml:14 contents/config/config.qml:6
+msgid "General"
+msgstr "Yleiset"
+
+#: contents/ui/ConfigGeneral.qml:30
+msgid "Price Thresholds (c/kWh)"
+msgstr "Hintarajat (c/kWh)"
+
+#: contents/ui/ConfigGeneral.qml:37
+msgid "Green threshold:"
+msgstr "Vihreä raja:"
+
+#: contents/ui/ConfigGeneral.qml:51
+msgid "Yellow threshold:"
+msgstr "Keltainen raja:"
+
+#: contents/ui/ConfigGeneral.qml:65
+msgid "Red threshold:"
+msgstr "Punainen raja:"
+
+#: contents/ui/ConfigGeneral.qml:79
+msgid "Price Margin"
+msgstr "Hintamarginaali"
+
+#: contents/ui/ConfigGeneral.qml:86
+msgid "Margin (c/kWh):"
+msgstr "Marginaali (c/kWh):"
+
+#: contents/ui/ConfigGeneral.qml:99
+msgid "This margin is added to all displayed prices"
+msgstr "Tämä marginaali lisätään kaikkiin näytettäviin hintoihin"
+
+#: contents/ui/ConfigGeneral.qml:104
+msgid "Transfer Fee"
+msgstr "Siirtohinta"
+
+#: contents/ui/ConfigGeneral.qml:110
+msgid "Transfer fee (c/kWh):"
+msgstr "Siirtohinta (c/kWh):"
+
+#: contents/ui/ConfigGeneral.qml:121
+msgid "This transfer fee is added to all displayed prices"
+msgstr "Tämä siirtohinta lisätään kaikkiin näytettäviin hintoihin"
