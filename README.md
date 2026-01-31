@@ -119,7 +119,7 @@ This widget uses the [spot-hinta.fi](https://spot-hinta.fi) API for price data. 
 
 ## Requirements
 
-- KDE Plasma 6.5.5 or later
+- KDE Plasma 6.0 or later
 - Qt 6.x
 
 ## License
