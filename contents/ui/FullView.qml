@@ -9,10 +9,15 @@ Rectangle {
     property var tomorrowPrices: []
     property bool showingTomorrow: false
     property bool tomorrowAvailable: false
+    property int currentHour: 0
     signal toggleDay()
     
-    width: 400
-    height: 300
+    implicitWidth: 600
+    implicitHeight: 350
+    Layout.minimumWidth: 500
+    Layout.minimumHeight: 250
+    Layout.preferredWidth: 600
+    Layout.preferredHeight: 350
     color: Kirigami.ColorUtils.tintWithAlpha(
         Kirigami.Theme.backgroundColor,
         Kirigami.Theme.textColor,
@@ -59,54 +64,64 @@ Rectangle {
             Layout.fillHeight: true
             visible: !showingTomorrow || tomorrowAvailable
             
-            // Calculate max price for scaling
-            property real maxPrice: {
+            // Store maxPrice as a property accessible to children
+            property real maxPriceValue: {
                 var prices = showingTomorrow ? tomorrowPrices : todayPrices
                 var max = 0
                 for (var i = 0; i < prices.length; i++) {
                     if (prices[i] > max) max = prices[i]
                 }
-                return Math.max(max, 1) // Avoid division by zero
+                return Math.max(max, 1)
             }
             
-            RowLayout {
+            Row {
                 anchors.fill: parent
-                spacing: 2
+                anchors.topMargin: 20
+                spacing: 4
                 
                 Repeater {
                     model: showingTomorrow ? tomorrowPrices : todayPrices
                     
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        spacing: 2
+                    Column {
+                        width: parent.width / 24 - 4
+                        height: parent.height
+                        spacing: 4
                         
                         // Price label
                         Label {
+                            width: parent.width
                             text: modelData.toFixed(1)
-                            font.pixelSize: 8
+                            font.pixelSize: 9
                             horizontalAlignment: Text.AlignHCenter
-                            Layout.alignment: Qt.AlignHCenter
                             visible: modelData > 0
+                            font.bold: index === currentHour && !showingTomorrow
+                            color: index === currentHour && !showingTomorrow ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                         }
                         
-                        // Bar
-                        Rectangle {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            Layout.maximumHeight: parent.height * 0.7
-                            Layout.minimumHeight: 4
-                            Layout.preferredHeight: (modelData / parent.parent.parent.maxPrice) * parent.height * 0.7
-                            color: modelData < 10 ? "#4CAF50" : modelData <= 20 ? "#FFC107" : "#F44336"
-                            radius: 2
+                        // Bar area
+                        Item {
+                            width: parent.width
+                            height: parent.height - 35
+                            
+                            Rectangle {
+                                anchors.bottom: parent.bottom
+                                width: parent.width
+                                height: parent.height * (modelData / parent.parent.parent.parent.maxPriceValue)
+                                color: modelData < 10 ? "#4CAF50" : modelData <= 20 ? "#FFC107" : "#F44336"
+                                radius: 2
+                                border.width: index === currentHour && !showingTomorrow ? 2 : 0
+                                border.color: Kirigami.Theme.highlightColor
+                            }
                         }
                         
                         // Hour label
                         Label {
+                            width: parent.width
                             text: index
-                            font.pixelSize: 8
+                            font.pixelSize: 9
                             horizontalAlignment: Text.AlignHCenter
-                            Layout.alignment: Qt.AlignHCenter
+                            font.bold: index === currentHour && !showingTomorrow
+                            color: index === currentHour && !showingTomorrow ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                         }
                     }
                 }
@@ -114,49 +129,55 @@ Rectangle {
         }
         
         // Legend
-        RowLayout {
+        Row {
             Layout.alignment: Qt.AlignHCenter
-            spacing: 16
+            spacing: 20
             
-            RowLayout {
-                spacing: 4
+            Row {
+                spacing: 6
                 Rectangle {
-                    width: 12
-                    height: 12
+                    width: 14
+                    height: 14
                     color: "#4CAF50"
                     radius: 2
+                    anchors.verticalCenter: parent.verticalCenter
                 }
                 Label {
                     text: "< 10c"
-                    font.pixelSize: 10
+                    font.pixelSize: 11
+                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
             
-            RowLayout {
-                spacing: 4
+            Row {
+                spacing: 6
                 Rectangle {
-                    width: 12
-                    height: 12
+                    width: 14
+                    height: 14
                     color: "#FFC107"
                     radius: 2
+                    anchors.verticalCenter: parent.verticalCenter
                 }
                 Label {
                     text: "10-20c"
-                    font.pixelSize: 10
+                    font.pixelSize: 11
+                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
             
-            RowLayout {
-                spacing: 4
+            Row {
+                spacing: 6
                 Rectangle {
-                    width: 12
-                    height: 12
+                    width: 14
+                    height: 14
                     color: "#F44336"
                     radius: 2
+                    anchors.verticalCenter: parent.verticalCenter
                 }
                 Label {
                     text: "> 20c"
-                    font.pixelSize: 10
+                    font.pixelSize: 11
+                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
         }

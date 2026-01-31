@@ -28,6 +28,7 @@ PlasmoidItem {
         tomorrowPrices: root.tomorrowPrices
         showingTomorrow: root.showingTomorrow
         tomorrowAvailable: root.tomorrowAvailable
+        currentHour: new Date().getHours()
         onToggleDay: root.toggleDay()
     }
     
@@ -35,7 +36,7 @@ PlasmoidItem {
     property string nextUpdateTime: ""
     
     Component.onCompleted: {
-        PriceFetcher.initialize(Plasmoid)
+        PriceFetcher.initialize()
         refreshData()
         
         // Set up timer to update at next 14:15
@@ -65,10 +66,13 @@ PlasmoidItem {
     }
     
     function refreshData() {
+        console.log("Starting data refresh...")
         PriceFetcher.fetchPrices(function(today, tomorrow) {
+            console.log("Data received - today:", today.length, "tomorrow:", tomorrow.length)
             root.todayPrices = today
             root.tomorrowPrices = tomorrow
             root.tomorrowAvailable = tomorrow.length > 0
+            console.log("Current hour:", new Date().getHours(), "Price:", today[new Date().getHours()])
             updateCurrentPrice()
         })
     }

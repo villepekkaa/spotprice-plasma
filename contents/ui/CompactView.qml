@@ -28,7 +28,7 @@ Item {
             }
             
             Label {
-                text: price.toFixed(1) + "c"
+                text: price < 1 ? price.toFixed(2) + "c" : price.toFixed(1) + "c"
                 font.pixelSize: 12
                 font.bold: true
                 horizontalAlignment: Text.AlignHCenter
