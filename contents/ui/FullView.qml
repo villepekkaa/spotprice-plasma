@@ -25,26 +25,21 @@ Item {
     Layout.minimumHeight: 280
     Layout.preferredWidth: 600
     Layout.preferredHeight: 400
-    Layout.fillWidth: true
-    Layout.fillHeight: true
 
     Component.onCompleted: {
         chartRepeater.model = showingTomorrow ? tomorrowPrices : todayPrices
         refreshRequested()
     }
 
-    onPriceMarginChanged: {
-        if (chartRepeater.model) {
-            var currentModel = chartRepeater.model
-            chartRepeater.model = []
-            chartRepeater.model = currentModel
-        }
-    }
-    onTransferFeeChanged: {
-        if (chartRepeater.model) {
-            var currentModel = chartRepeater.model
-            chartRepeater.model = []
-            chartRepeater.model = currentModel
+    onPriceMarginChanged: Qt.callLater(refreshChart)
+    onTransferFeeChanged: Qt.callLater(refreshChart)
+    
+    function refreshChart() {
+        // Force re-evaluation of chart by triggering property bindings
+        var prices = showingTomorrow ? tomorrowPrices : todayPrices
+        if (prices && prices.length > 0) {
+            chartRepeater.model = null
+            chartRepeater.model = prices
         }
     }
     onTodayPricesChanged: {
