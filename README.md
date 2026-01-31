@@ -24,9 +24,10 @@ git clone https://github.com/villepekkaa/spotprices.git
 cd spotprices
 ```
 
-2. Copy to Plasma widgets directory:
+2. Copy to Plasma widgets directory (excluding .git):
 ```bash
-cp -r . ~/.local/share/plasma/plasmoids/com.villepekkaa.spotprice
+mkdir -p ~/.local/share/plasma/plasmoids/com.villepekkaa.spotprice
+cp -r contents metadata.json LICENSE README.md AGENTS.md ~/.local/share/plasma/plasmoids/com.villepekkaa.spotprice/
 ```
 
 3. Restart Plasma or run:

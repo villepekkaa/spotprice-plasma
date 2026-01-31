@@ -4,17 +4,18 @@
         "Authors": [
             {
                 "Email": "",
-                "Name": "villepekkaa"
+                "Name": "Ville-Pekka Alavuotunki"
             }
         ],
-        "BugReportUrl": "https://github.com/villepekkaa/spotprices/issues",
+        "BugReportUrl": "https://github.com/villepekkaa/spotprices-plasma/issues",
         "Category": "Utilities",
         "Description": "Display Finnish electricity spot prices from spot-hinta.fi",
-        "Icon": "preferences-system-time",
+        "Icon": "preferences-plugin-symbols",
         "Id": "com.villepekkaa.spotprice",
         "Name": "SpotPrice",
         "Version": "1.0.0",
-        "Website": "https://github.com/villepekkaa/spotprices"
+        "License": "MIT",
+        "Website": "https://github.com/villepekkaa/spotprices-plasma"
     },
     "X-Plasma-API-Minimum-Version": "6.0"
 }

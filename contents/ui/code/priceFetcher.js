@@ -2,8 +2,6 @@
 // This module fetches electricity prices and caches them locally
 // Update logic: Fetch on startup if no cache, then at 14:15 daily when tomorrow prices become available
 
-.pragma library
-
 var cachedData = null
 var cacheDir = ""
 
