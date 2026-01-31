@@ -1,0 +1,20 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "",
+                "Name": "villepekkaa"
+            }
+        ],
+        "BugReportUrl": "https://github.com/villepekkaa/spotprices/issues",
+        "Category": "Utilities",
+        "Description": "Display Finnish electricity spot prices from spot-hinta.fi",
+        "Icon": "preferences-system-time",
+        "Id": "com.villepekkaa.spotprice",
+        "Name": "SpotPrice",
+        "Version": "1.0.0",
+        "Website": "https://github.com/villepekkaa/spotprices"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}
