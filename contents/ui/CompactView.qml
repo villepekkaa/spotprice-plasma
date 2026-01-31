@@ -12,12 +12,16 @@ Item {
     
     Layout.fillWidth: true
     Layout.fillHeight: true
-    Layout.minimumWidth: 85
-    Layout.preferredWidth: 90
+    Layout.minimumWidth: 110
+    Layout.preferredWidth: 115
     
     MouseArea {
         anchors.fill: parent
         onClicked: parent.clicked()
+    }
+
+    Component.onCompleted: {
+        console.log("CompactView completed")
     }
     
     Rectangle {
@@ -36,7 +40,7 @@ Item {
             }
             
             Label {
-                text: price < 1 ? price.toFixed(2) + "c" : price.toFixed(1) + "c"
+                text: (price < 1 ? price.toFixed(2) : price.toFixed(1)) + " " + i18n("c/kWh")
                 font.pixelSize: 14
                 font.weight: Font.Medium
                 color: Kirigami.Theme.textColor

@@ -4,6 +4,59 @@
 
 This is a KDE Plasma 6 widget for displaying Finnish electricity spot prices. It uses QML (Qt Meta Language) and JavaScript for the UI and logic.
 
+## Localization (i18n)
+
+The widget supports localization and follows KDE Plasma's system language setting. Currently supported languages:
+- **English (en)** - Primary language (default)
+- **Finnish (fi)** - Secondary language
+
+### How Localization Works
+
+1. Strings in QML files are marked with `i18n("text")` for translation
+2. Translation files are stored in `translations/` as `.po` files
+3. Compiled `.mo` files are installed to `contents/locale/<lang>/LC_MESSAGES/`
+4. The widget automatically uses KDE Plasma's current language setting
+5. Falls back to English if the system language is not supported
+
+### Adding/Updating Translations
+
+```bash
+# Extract translatable strings from source code
+./Messages.sh
+
+# Update existing translation files with new strings
+msgmerge -U translations/fi.po translations/spotprice.pot
+msgmerge -U translations/en.po translations/spotprice.pot
+
+# Edit translations (use any .po file editor)
+# Then compile to .mo files
+./compile_translations.sh
+
+# Install the widget to test
+make install
+```
+
+### Translation File Locations
+
+```
+translations/
+├── fi.po           # Finnish translations
+├── en.po           # English translations
+└── spotprice.pot   # Template (auto-generated)
+
+contents/locale/
+├── fi/LC_MESSAGES/spotprice.mo
+└── en/LC_MESSAGES/spotprice.mo
+```
+
+### Adding a New Language
+
+1. Copy `translations/en.po` to `translations/<lang>.po`
+2. Update the language headers in the new .po file
+3. Translate all strings
+4. Run `./compile_translations.sh`
+5. Test by installing the widget
+
 ## Technology Stack
 
 - **QML**: Declarative UI language for Qt
@@ -17,14 +70,25 @@ This is a KDE Plasma 6 widget for displaying Finnish electricity spot prices. It
 .
 ├── metadata.json              # Widget metadata (name, version, etc.)
 ├── contents/
+│   ├── code/
+│   │   └── priceFetcher.js    # API and caching logic
 │   ├── config/
-│   │   └── main.xml           # Configuration options
-│   ├── ui/
-│   │   ├── main.qml           # Main widget entry point
-│   │   ├── CompactView.qml    # Taskbar/compact view
-│   │   └── FullView.qml       # Desktop/full view
-│   └── code/
-│       └── priceFetcher.js    # API and caching logic
+│   │   ├── config.qml         # Config dialog entry point
+│   │   └── main.xml           # Configuration options (legacy)
+│   ├── locale/                # Compiled translation files
+│   │   ├── fi/LC_MESSAGES/spotprice.mo
+│   │   └── en/LC_MESSAGES/spotprice.mo
+│   └── ui/
+│       ├── main.qml           # Main widget entry point
+│       ├── CompactView.qml    # Taskbar/compact view
+│       ├── FullView.qml       # Desktop/full view
+│       └── ConfigGeneral.qml  # Settings dialog
+├── translations/              # Translation source files
+│   ├── fi.po
+│   ├── en.po
+│   └── spotprice.pot
+├── Messages.sh                # Script to extract translations
+├── compile_translations.sh    # Script to compile .po to .mo
 ├── README.md
 ├── LICENSE
 └── AGENTS.md (this file)
@@ -86,6 +150,7 @@ qml6 -typeinfo contents/ui/main.qml
 - [ ] Full view shows bar chart
 - [ ] Day switching works
 - [ ] Tomorrow prices show after 14:15
+- [ ] Price margin and transfer fee affect displayed prices
 - [ ] Caching works (no excessive API calls)
 - [ ] Offline mode handles gracefully
 
