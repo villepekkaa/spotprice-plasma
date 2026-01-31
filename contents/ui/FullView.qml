@@ -43,19 +43,27 @@ Rectangle {
             Item { Layout.fillWidth: true }
             
             Button {
-                text: showingTomorrow ? "Näytä tänään" : "Näytä huomenna"
-                enabled: !showingTomorrow || tomorrowAvailable
+                text: showingTomorrow ? "Tänään" : "Huomenna"
+                enabled: true
+                opacity: tomorrowAvailable || showingTomorrow ? 1.0 : 0.5
                 onClicked: toggleDay()
             }
         }
         
         // Tomorrow not available message
-        Label {
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
             visible: showingTomorrow && !tomorrowAvailable
-            text: "Huomisen hinnat päivittyvät noin klo 14:15"
-            color: Kirigami.Theme.neutralTextColor
-            font.italic: true
-            Layout.alignment: Qt.AlignHCenter
+            
+            Label {
+                anchors.centerIn: parent
+                text: "Huomisen hinnat saatavilla noin klo 14:15"
+                font.pixelSize: 14
+                color: Kirigami.Theme.textColor
+                font.italic: true
+                horizontalAlignment: Text.AlignHCenter
+            }
         }
         
         // Price chart

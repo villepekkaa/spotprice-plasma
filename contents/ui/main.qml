@@ -90,7 +90,15 @@ PlasmoidItem {
             console.log("Data received - today:", today.length, "tomorrow:", tomorrow.length)
             root.todayPrices = today
             root.tomorrowPrices = tomorrow
-            root.tomorrowAvailable = tomorrow.length > 0
+            // Check if tomorrow has actual prices (not just empty/zeros)
+            var hasTomorrowPrices = false
+            for (var i = 0; i < tomorrow.length; i++) {
+                if (tomorrow[i] > 0) {
+                    hasTomorrowPrices = true
+                    break
+                }
+            }
+            root.tomorrowAvailable = hasTomorrowPrices
             console.log("Current hour:", new Date().getHours(), "Price:", today[new Date().getHours()])
             updateCurrentPrice()
         })
