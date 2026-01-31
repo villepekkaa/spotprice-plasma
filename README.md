@@ -34,6 +34,13 @@ cp -r . ~/.local/share/plasma/plasmoids/com.villepekkaa.spotprice
 kpackagetool6 --upgrade ~/.local/share/plasma/plasmoids/com.villepekkaa.spotprice
 ```
 
+Alternative restart methods:
+```bash
+kquitapp6 plasmashell && kstart plasmashell
+# or
+plasmashell --replace
+```
+
 4. Add widget to your desktop or panel:
    - Right-click on desktop/panel → Add Widgets
    - Search for "SpotPrice"

@@ -57,7 +57,9 @@ This is a KDE Plasma 6 widget for displaying Finnish electricity spot prices. It
 cp -r . ~/.local/share/plasma/plasmoids/com.villepekkaa.spotprice
 
 # Restart Plasma (testing changes)
-kquitapp6 plasmashell && kstart6 plasmashell
+kquitapp6 plasmashell && kstart plasmashell
+# or
+plasmashell --replace
 
 # Check QML syntax
 qml6 -typeinfo contents/ui/main.qml

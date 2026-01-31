@@ -20,7 +20,7 @@ PlasmoidItem {
     compactRepresentation: CompactView {
         price: root.currentPrice
         priceColor: root.currentPriceColor
-        onClicked: root.expanded = true
+        onClicked: root.expanded = !root.expanded
     }
     
     // Full representation (desktop view)
