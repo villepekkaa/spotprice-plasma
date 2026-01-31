@@ -2,9 +2,10 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import org.kde.plasma.core as PlasmaCore
+import org.kde.plasma.components as PlasmaComponents
 import org.kde.kirigami as Kirigami
 
-Rectangle {
+Item {
     property var todayPrices: []
     property var tomorrowPrices: []
     property bool showingTomorrow: false
@@ -18,12 +19,6 @@ Rectangle {
     Layout.minimumHeight: 250
     Layout.preferredWidth: 600
     Layout.preferredHeight: 350
-    color: Kirigami.ColorUtils.tintWithAlpha(
-        Kirigami.Theme.backgroundColor,
-        Kirigami.Theme.textColor,
-        0.1
-    )
-    radius: 8
     
     ColumnLayout {
         anchors.fill: parent
@@ -42,7 +37,7 @@ Rectangle {
             
             Item { Layout.fillWidth: true }
             
-            Button {
+            PlasmaComponents.Button {
                 text: showingTomorrow ? "Tänään" : "Huomenna"
                 enabled: true
                 opacity: tomorrowAvailable || showingTomorrow ? 1.0 : 0.5
