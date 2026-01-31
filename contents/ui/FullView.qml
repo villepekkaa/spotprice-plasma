@@ -2,9 +2,10 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import org.kde.plasma.core as PlasmaCore
+import org.kde.plasma.components as PlasmaComponents
 import org.kde.kirigami as Kirigami
 
-Rectangle {
+Item {
     property var todayPrices: []
     property var tomorrowPrices: []
     property bool showingTomorrow: false
@@ -18,12 +19,6 @@ Rectangle {
     Layout.minimumHeight: 250
     Layout.preferredWidth: 600
     Layout.preferredHeight: 350
-    color: Kirigami.ColorUtils.tintWithAlpha(
-        Kirigami.Theme.backgroundColor,
-        Kirigami.Theme.textColor,
-        0.1
-    )
-    radius: 8
     
     ColumnLayout {
         anchors.fill: parent
@@ -42,20 +37,28 @@ Rectangle {
             
             Item { Layout.fillWidth: true }
             
-            Button {
-                text: showingTomorrow ? "Näytä tänään" : "Näytä huomenna"
-                enabled: !showingTomorrow || tomorrowAvailable
+            PlasmaComponents.Button {
+                text: showingTomorrow ? "Tänään" : "Huomenna"
+                enabled: true
+                opacity: tomorrowAvailable || showingTomorrow ? 1.0 : 0.5
                 onClicked: toggleDay()
             }
         }
         
         // Tomorrow not available message
-        Label {
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
             visible: showingTomorrow && !tomorrowAvailable
-            text: "Huomisen hinnat päivittyvät noin klo 14:15"
-            color: Kirigami.Theme.neutralTextColor
-            font.italic: true
-            Layout.alignment: Qt.AlignHCenter
+            
+            Label {
+                anchors.centerIn: parent
+                text: "Huomisen hinnat saatavilla noin klo 14:15"
+                font.pixelSize: 14
+                color: Kirigami.Theme.textColor
+                font.italic: true
+                horizontalAlignment: Text.AlignHCenter
+            }
         }
         
         // Price chart
