@@ -82,5 +82,8 @@ msgstr "Halvin"
 msgid "Most expensive"
 msgstr "Kallein"
 
-msgid "Average"
-msgstr "Keskiarvo"
+msgid "Average 7-23"
+msgstr "Keskihinta 7-23"
+
+msgid "Average 24h"
+msgstr "Keskihinta 24h"

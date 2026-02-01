@@ -82,5 +82,8 @@ msgstr "Cheapest"
 msgid "Most expensive"
 msgstr "Most expensive"
 
-msgid "Average"
-msgstr "Average"
+msgid "Average 7-23"
+msgstr "Average 7-23"
+
+msgid "Average 24h"
+msgstr "Average 24h"

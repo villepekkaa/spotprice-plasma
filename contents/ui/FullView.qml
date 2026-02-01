@@ -74,20 +74,27 @@ Item {
             spacing: 24
             visible: computedPrices.length > 0
 
-            // Calculate min, max and average
+            // Calculate min, max and averages (24h and 7-23 daytime)
             property var minMaxInfo: {
                 var prices = computedPrices
                 var minPrice = Infinity
                 var maxPrice = -Infinity
                 var minHour = -1
                 var maxHour = -1
-                var sum = 0
-                var count = 0
+                var sum24h = 0
+                var sumDaytime = 0
+                var count24h = 0
+                var countDaytime = 0
 
                 for (var i = 0; i < prices.length; i++) {
                     var price = prices[i] || 0
-                    sum += price
-                    count++
+                    sum24h += price
+                    count24h++
+                    // Daytime hours: 7-23 (inclusive)
+                    if (i >= 7 && i <= 23) {
+                        sumDaytime += price
+                        countDaytime++
+                    }
                     if (price < minPrice) {
                         minPrice = price
                         minHour = i
@@ -101,7 +108,8 @@ Item {
                 return {
                     minPrice: minPrice === Infinity ? 0 : minPrice,
                     maxPrice: maxPrice === -Infinity ? 0 : maxPrice,
-                    avgPrice: count > 0 ? sum / count : 0,
+                    avgPrice24h: count24h > 0 ? sum24h / count24h : 0,
+                    avgPriceDaytime: countDaytime > 0 ? sumDaytime / countDaytime : 0,
                     minHour: minHour,
                     maxHour: maxHour
                 }
@@ -151,22 +159,22 @@ Item {
                 }
             }
 
-            // Average price
+            // Daytime average (7-23)
             Rectangle {
-                width: avgCol.width + 16
-                height: avgCol.height + 12
+                width: avgDayCol.width + 16
+                height: avgDayCol.height + 12
                 color: Qt.rgba(0.13, 0.59, 0.95, 0.15)  // #2196F3 with 15% opacity
                 radius: 6
                 border.width: 1
                 border.color: Qt.rgba(0.13, 0.59, 0.95, 0.3)
 
                 Column {
-                    id: avgCol
+                    id: avgDayCol
                     anchors.centerIn: parent
                     spacing: 2
 
                     Label {
-                        text: i18n("Average")
+                        text: i18n("Average 7-23")
                         font.pixelSize: 10
                         color: "#1976D2"
                         horizontalAlignment: Text.AlignHCenter
@@ -175,7 +183,40 @@ Item {
                         spacing: 4
                         anchors.horizontalCenter: parent.horizontalCenter
                         Label {
-                            text: minMaxRow.minMaxInfo.avgPrice.toFixed(1) + " c/kWh"
+                            text: minMaxRow.minMaxInfo.avgPriceDaytime.toFixed(1) + " c/kWh"
+                            font.pixelSize: 12
+                            font.bold: true
+                            color: "#1565C0"
+                        }
+                    }
+                }
+            }
+
+            // 24h average
+            Rectangle {
+                width: avg24Col.width + 16
+                height: avg24Col.height + 12
+                color: Qt.rgba(0.13, 0.59, 0.95, 0.10)  // Lighter blue for secondary avg
+                radius: 6
+                border.width: 1
+                border.color: Qt.rgba(0.13, 0.59, 0.95, 0.2)
+
+                Column {
+                    id: avg24Col
+                    anchors.centerIn: parent
+                    spacing: 2
+
+                    Label {
+                        text: i18n("Average 24h")
+                        font.pixelSize: 10
+                        color: "#1976D2"
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                    Row {
+                        spacing: 4
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        Label {
+                            text: minMaxRow.minMaxInfo.avgPrice24h.toFixed(1) + " c/kWh"
                             font.pixelSize: 12
                             font.bold: true
                             color: "#1565C0"
