@@ -88,5 +88,14 @@ msgstr "Average 7-23"
 msgid "Average 24h"
 msgstr "Average 24h"
 
+msgid "Last update %1"
+msgstr "Last update %1"
+
+msgid "Next update %1"
+msgstr "Next update %1"
+
+msgid "Update failed (%1), using cached prices"
+msgstr "Update failed (%1), using cached prices"
+
 msgid "%1-%2"
 msgstr "%1 - %2"

@@ -16,6 +16,9 @@ Item {
     property real greenThreshold: 10.0
     property real yellowThreshold: 20.0
     property real redThreshold: 30.0
+    property string lastUpdateTime: ""
+    property string nextUpdateTime: ""
+    property string lastErrorMessage: ""
     signal toggleDay()
     signal refreshRequested()
 
@@ -52,32 +55,83 @@ Item {
         anchors.margins: 16
         spacing: 12
         
-        // Header with title and day toggle
+        // Header with title, status info and day toggle
         RowLayout {
             Layout.fillWidth: true
+            Layout.minimumHeight: 50
+            spacing: 8
             
-            Label {
-                text: showingTomorrow ? i18n("Tomorrow") : i18n("Today")
-                font.pixelSize: 18
-                font.bold: true
+            // Left side: status info
+            ColumnLayout {
+                spacing: 2
+                Layout.alignment: Qt.AlignVCenter
+                
+                Label {
+                    text: lastUpdateTime ? i18n("Last update %1", lastUpdateTime) : ""
+                    font.pixelSize: 10
+                    color: Kirigami.Theme.textColor
+                    visible: lastUpdateTime.length > 0
+                }
+                
+                Label {
+                    text: nextUpdateTime ? i18n("Next update %1", nextUpdateTime) : ""
+                    font.pixelSize: 10
+                    color: Kirigami.Theme.textColor
+                    visible: nextUpdateTime.length > 0
+                }
             }
 
             Item { Layout.fillWidth: true }
 
+            // Center: Title
+            Label {
+                text: showingTomorrow ? i18n("Tomorrow") : i18n("Today")
+                font.pixelSize: 18
+                font.bold: true
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            Item { Layout.fillWidth: true }
+
+            // Right side: Toggle button
             PlasmaComponents.Button {
                 text: showingTomorrow ? i18n("Today") : i18n("Tomorrow")
                 enabled: true
                 opacity: tomorrowAvailable || showingTomorrow ? 1.0 : 0.5
                 onClicked: toggleDay()
+                Layout.alignment: Qt.AlignVCenter
+            }
+        }
+
+        // Error message with fixed height to prevent layout jumping
+        Item {
+            Layout.fillWidth: true
+            Layout.minimumHeight: lastErrorMessage.length > 0 ? 20 : 0
+            Layout.maximumHeight: lastErrorMessage.length > 0 ? 40 : 0
+            
+            Label {
+                anchors.fill: parent
+                text: lastErrorMessage ? i18n("Update failed (%1), using cached prices", lastErrorMessage) : ""
+                font.pixelSize: 11
+                color: Kirigami.Theme.negativeTextColor
+                wrapMode: Text.Wrap
+                visible: lastErrorMessage.length > 0
+                verticalAlignment: Text.AlignVCenter
             }
         }
 
         // Min/Max price info - centered
-        Row {
-            id: minMaxRow
-            Layout.alignment: Qt.AlignHCenter
-            spacing: 24
-            visible: computedPrices.length > 0 && (!showingTomorrow || tomorrowAvailable)
+        // Wrapped in Item with fixed height to prevent layout jumping
+        Item {
+            Layout.fillWidth: true
+            Layout.minimumHeight: minMaxRow.visible ? 70 : 0
+            Layout.maximumHeight: minMaxRow.visible ? 70 : 0
+            
+            Row {
+                id: minMaxRow
+                anchors.centerIn: parent
+                spacing: 24
+                visible: computedPrices.length > 0 && (!showingTomorrow || tomorrowAvailable)
 
             // Calculate min, max and averages (24h and 7-23 daytime)
             property var minMaxInfo: {
@@ -276,6 +330,7 @@ Item {
                     }
                 }
             }
+        }
         }
         
         // Tomorrow not available message
