@@ -37,7 +37,12 @@ Item {
         var fee = transferFee || 0
         var result = []
         for (var i = 0; i < prices.length; i++) {
-            result.push((prices[i] || 0) + margin + fee)
+            var price = prices[i]
+            if (typeof price === 'number' && !isNaN(price)) {
+                result.push(price + margin + fee)
+            } else {
+                result.push(null)
+            }
         }
         return result
     }
@@ -87,7 +92,10 @@ Item {
                 var countDaytime = 0
 
                 for (var i = 0; i < prices.length; i++) {
-                    var price = prices[i] || 0
+                    var price = prices[i]
+                    if (typeof price !== 'number' || isNaN(price)) {
+                        continue
+                    }
                     sum24h += price
                     count24h++
                     // Daytime hours: 7-23 (inclusive)
@@ -300,7 +308,10 @@ Item {
                 var margin = FullView.priceMargin || 0
                 var fee = FullView.transferFee || 0
                 for (var i = 0; i < prices.length; i++) {
-                    var price = prices[i] || 0
+                    var price = prices[i]
+                    if (typeof price !== 'number' || isNaN(price)) {
+                        continue
+                    }
                     var totalPrice = price + margin + fee
                     if (totalPrice > max) max = totalPrice
                 }
@@ -325,7 +336,7 @@ Item {
 
                         property int hourIndex: index
                         // modelData is already the computed price with margin/fee
-                        property real displayPrice: modelData || 0
+                        property real displayPrice: (typeof modelData === 'number' && !isNaN(modelData)) ? modelData : 0
                         property real maxPrice: chartArea.maxPriceValue
                         
                         // Price label

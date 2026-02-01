@@ -23,7 +23,7 @@ function fetchPrices(callback, forceRefresh) {
     
     // Check if we have today's data in cache
     var todayDateStr = formatDate(now)
-    var hasTodayData = cached.today.length > 0 && isSameDay(cached.date, todayDateStr)
+    var hasTodayData = isSameDay(cached.date, todayDateStr) && hasPriceData(cached.today)
     
     // Always fetch if no today's data in cache
     if (!hasTodayData) {
@@ -34,7 +34,7 @@ function fetchPrices(callback, forceRefresh) {
     
     // If it's after 14:15 and we don't have tomorrow's data, fetch
     var isAfter1415 = currentHour > 14 || (currentHour === 14 && currentMinute >= 15)
-    var hasTomorrowData = cached.tomorrow.length > 0 && cached.tomorrow.some(function(p) { return p > 0 })
+    var hasTomorrowData = hasPriceData(cached.tomorrow)
     
     if (isAfter1415 && !hasTomorrowData) {
         console.log("Fetching prices: after 14:15 and no tomorrow data")
@@ -59,6 +59,17 @@ function isSameDay(dateStr1, dateStr2) {
     return dateStr1 === dateStr2
 }
 
+function hasPriceData(prices) {
+    if (!prices || prices.length === 0) return false
+    for (var i = 0; i < prices.length; i++) {
+        var price = prices[i]
+        if (typeof price === 'number' && !isNaN(price)) {
+            return true
+        }
+    }
+    return false
+}
+
 function fetchFromAPI(callback) {
     var today = []
     var tomorrow = []
@@ -67,6 +78,7 @@ function fetchFromAPI(callback) {
     var req = new XMLHttpRequest()
     req.onreadystatechange = function() {
         if (req.readyState === XMLHttpRequest.DONE) {
+            var success = false
             if (req.status === 200) {
                 try {
                     var data = JSON.parse(req.responseText)
@@ -80,6 +92,10 @@ function fetchFromAPI(callback) {
                     tomorrowDate.setDate(tomorrowDate.getDate() + 1)
                     var tomorrowStr = formatDate(tomorrowDate)
                     tomorrow = parsePricesForDate(data, tomorrowStr)
+                    success = hasPriceData(today)
+                    if (!success) {
+                        console.error("No valid today prices in API response")
+                    }
                 } catch (e) {
                     console.error("Error parsing price data:", e)
                 }
@@ -87,8 +103,19 @@ function fetchFromAPI(callback) {
                 console.error("API request failed with status:", req.status)
             }
             
-            cachePrices(today, tomorrow)
-            callback(today, tomorrow)
+            if (success) {
+                cachePrices(today, tomorrow)
+                callback(today, tomorrow)
+                return
+            }
+            
+            var cached = loadCachedPrices()
+            if (hasPriceData(cached.today) || hasPriceData(cached.tomorrow)) {
+                callback(cached.today, cached.tomorrow)
+                return
+            }
+            
+            callback([], [])
         }
     }
     
@@ -131,7 +158,7 @@ function parsePricesForDate(data, dateStr) {
             }
             hourlyPrices.push(sum / hourGroups[h].length)
         } else {
-            hourlyPrices.push(0)
+            hourlyPrices.push(null)
         }
     }
     
@@ -149,6 +176,7 @@ function cachePrices(today, tomorrow) {
     try {
         var now = new Date()
         var cache = {
+            schemaVersion: 2,
             date: formatDate(now),
             timestamp: Date.now(),
             today: today,
@@ -173,6 +201,11 @@ function loadCachedPrices() {
             if (data) {
                 var parsed = JSON.parse(data)
                 if (parsed && parsed.date) {
+                    if (!parsed.schemaVersion || parsed.schemaVersion < 2) {
+                        parsed.today = normalizeLegacyPriceArray(parsed.today)
+                        parsed.tomorrow = normalizeLegacyPriceArray(parsed.tomorrow)
+                        parsed.schemaVersion = 2
+                    }
                     // Validate that cache is not too old (older than 2 days)
                     var cacheDate = new Date(parsed.date)
                     var now = new Date()
@@ -192,6 +225,23 @@ function loadCachedPrices() {
         return cachedData
     }
     return { date: null, today: [], tomorrow: [] }
+}
+
+function normalizeLegacyPriceArray(prices) {
+    if (!Array.isArray(prices) || prices.length === 0) return prices
+    var allZero = true
+    for (var i = 0; i < prices.length; i++) {
+        if (prices[i] !== 0) {
+            allZero = false
+            break
+        }
+    }
+    if (!allZero) return prices
+    var normalized = []
+    for (var j = 0; j < prices.length; j++) {
+        normalized.push(null)
+    }
+    return normalized
 }
 
 // Get milliseconds until next 14:15

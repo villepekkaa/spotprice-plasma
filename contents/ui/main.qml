@@ -69,10 +69,13 @@ PlasmoidItem {
     // Property for next update time display
     property string nextUpdateTime: ""
     property int lastKnownHour: -1
+    property string lastKnownDate: ""
     
     Component.onCompleted: {
         PriceFetcher.initialize()
-        lastKnownHour = new Date().getHours()
+        var now = new Date()
+        lastKnownHour = now.getHours()
+        lastKnownDate = formatDate(now)
         
         // Check if we need to force refresh (after 14:15 without tomorrow data)
         var now = new Date()
@@ -104,7 +107,19 @@ PlasmoidItem {
         repeat: true
         running: true
         onTriggered: {
-            var currentHour = new Date().getHours()
+            var now = new Date()
+            var currentHour = now.getHours()
+            var currentDate = formatDate(now)
+            
+            // Check if day has changed (date string differs)
+            if (currentDate !== root.lastKnownDate) {
+                console.log("Day changed from", root.lastKnownDate, "to", currentDate, "- fetching new prices")
+                root.lastKnownDate = currentDate
+                root.lastKnownHour = currentHour
+                refreshData(true) // Force refresh on day change
+                return
+            }
+            
             if (currentHour !== root.lastKnownHour) {
                 root.lastKnownHour = currentHour
                 updateCurrentPrice()
@@ -134,7 +149,8 @@ PlasmoidItem {
             // Check if tomorrow has actual prices (not just empty/zeros)
             var hasTomorrowPrices = false
             for (var i = 0; i < tomorrow.length; i++) {
-                if (tomorrow[i] > 0) {
+                var price = tomorrow[i]
+                if (typeof price === 'number' && !isNaN(price)) {
                     hasTomorrowPrices = true
                     break
                 }
@@ -170,5 +186,12 @@ PlasmoidItem {
     function toggleDay() {
         root.showingTomorrow = !root.showingTomorrow
         updateCurrentPrice()
+    }
+    
+    function formatDate(date) {
+        var year = date.getFullYear()
+        var month = String(date.getMonth() + 1).padStart(2, '0')
+        var day = String(date.getDate()).padStart(2, '0')
+        return year + '-' + month + '-' + day
     }
 }
