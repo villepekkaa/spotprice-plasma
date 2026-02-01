@@ -3,14 +3,19 @@
 // Update logic: Fetch on startup if no cache, then at 14:15 daily when tomorrow prices become available
 
 var cachedData = null
-var cacheDir = ""
+var cacheFile = null
 
 function initialize() {
-    // Cache directory will be set from QML side
-    // For now, we don't need to do anything here
+    // Set up cache file path in Plasma's standard cache location
+    if (!cacheFile && typeof StandardPaths !== 'undefined') {
+        var cacheDir = StandardPaths.writableLocation(StandardPaths.CacheLocation)
+        cacheFile = cacheDir + "/spotprices.json"
+    }
+    // Load existing cache from file
+    cachedData = loadCachedPrices()
 }
 
-function fetchPrices(callback) {
+function fetchPrices(callback, forceRefresh) {
     var cached = loadCachedPrices()
     var now = new Date()
     var currentHour = now.getHours()
@@ -22,20 +27,30 @@ function fetchPrices(callback) {
     
     // Always fetch if no today's data in cache
     if (!hasTodayData) {
+        console.log("Fetching prices: no today's data in cache")
         fetchFromAPI(callback)
         return
     }
     
     // If it's after 14:15 and we don't have tomorrow's data, fetch
     var isAfter1415 = currentHour > 14 || (currentHour === 14 && currentMinute >= 15)
-    var hasTomorrowData = cached.tomorrow.length > 0
+    var hasTomorrowData = cached.tomorrow.length > 0 && cached.tomorrow.some(function(p) { return p > 0 })
     
     if (isAfter1415 && !hasTomorrowData) {
+        console.log("Fetching prices: after 14:15 and no tomorrow data")
+        fetchFromAPI(callback)
+        return
+    }
+    
+    // Force refresh if requested
+    if (forceRefresh) {
+        console.log("Fetching prices: forced refresh")
         fetchFromAPI(callback)
         return
     }
     
     // Use cached data
+    console.log("Using cached prices - today:", cached.today.length, "tomorrow:", cached.tomorrow.length)
     callback(cached.today, cached.tomorrow)
 }
 
@@ -47,58 +62,38 @@ function isSameDay(dateStr1, dateStr2) {
 function fetchFromAPI(callback) {
     var today = []
     var tomorrow = []
-    var requestsCompleted = 0
     
-    function checkComplete() {
-        requestsCompleted++
-        if (requestsCompleted >= 2) {
-            cachePrices(today, tomorrow)
-            callback(today, tomorrow)
-        }
-    }
-    
-    // Fetch today's prices
-    var todayReq = new XMLHttpRequest()
-    todayReq.onreadystatechange = function() {
-        if (todayReq.readyState === XMLHttpRequest.DONE) {
-            if (todayReq.status === 200) {
+    // Single API call - TodayAndDayForward returns both today's and tomorrow's prices
+    var req = new XMLHttpRequest()
+    req.onreadystatechange = function() {
+        if (req.readyState === XMLHttpRequest.DONE) {
+            if (req.status === 200) {
                 try {
-                    var data = JSON.parse(todayReq.responseText)
-                    today = parsePrices(data)
-                } catch (e) {
-                }
-            } else {
-            }
-            checkComplete()
-        }
-    }
-    
-    var today = new Date()
-    var dateStr = formatDate(today)
-    todayReq.open("GET", "https://api.spot-hinta.fi/TodayAndDayForward")
-    todayReq.send()
-    
-    // Fetch tomorrow's prices (if available after 14:15)
-    var tomorrowReq = new XMLHttpRequest()
-    tomorrowReq.onreadystatechange = function() {
-        if (tomorrowReq.readyState === XMLHttpRequest.DONE) {
-            if (tomorrowReq.status === 200) {
-                try {
-                    var data = JSON.parse(tomorrowReq.responseText)
-                    // Filter for tomorrow's date
+                    var data = JSON.parse(req.responseText)
+                    // Parse today's prices
+                    var todayDate = new Date()
+                    var todayStr = formatDate(todayDate)
+                    today = parsePricesForDate(data, todayStr)
+                    
+                    // Parse tomorrow's prices
                     var tomorrowDate = new Date()
                     tomorrowDate.setDate(tomorrowDate.getDate() + 1)
                     var tomorrowStr = formatDate(tomorrowDate)
                     tomorrow = parsePricesForDate(data, tomorrowStr)
                 } catch (e) {
+                    console.error("Error parsing price data:", e)
                 }
+            } else {
+                console.error("API request failed with status:", req.status)
             }
-            checkComplete()
+            
+            cachePrices(today, tomorrow)
+            callback(today, tomorrow)
         }
     }
     
-    tomorrowReq.open("GET", "https://api.spot-hinta.fi/TodayAndDayForward")
-    tomorrowReq.send()
+    req.open("GET", "https://api.spot-hinta.fi/TodayAndDayForward")
+    req.send()
 }
 
 function parsePrices(data) {
@@ -159,14 +154,40 @@ function cachePrices(today, tomorrow) {
             today: today,
             tomorrow: tomorrow
         }
-        // In a real implementation, we'd write to a file
-        // For now, we'll just keep it in memory
         cachedData = cache
+        
+        // Persist to file using Plasma's data file mechanism
+        if (typeof DataFile !== 'undefined') {
+            DataFile.write("spotprices.json", JSON.stringify(cache))
+        }
     } catch (e) {
+        console.error("Error caching prices:", e)
     }
 }
 
 function loadCachedPrices() {
+    // Try to load from persisted storage first
+    if (typeof DataFile !== 'undefined') {
+        try {
+            var data = DataFile.read("spotprices.json")
+            if (data) {
+                var parsed = JSON.parse(data)
+                if (parsed && parsed.date) {
+                    // Validate that cache is not too old (older than 2 days)
+                    var cacheDate = new Date(parsed.date)
+                    var now = new Date()
+                    var diffDays = (now - cacheDate) / (1000 * 60 * 60 * 24)
+                    if (diffDays < 2) {
+                        return parsed
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Error loading cached prices:", e)
+        }
+    }
+    
+    // Fall back to in-memory cache
     if (cachedData && cachedData.date) {
         return cachedData
     }

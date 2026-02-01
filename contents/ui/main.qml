@@ -73,7 +73,13 @@ PlasmoidItem {
     Component.onCompleted: {
         PriceFetcher.initialize()
         lastKnownHour = new Date().getHours()
-        refreshData()
+        
+        // Check if we need to force refresh (after 14:15 without tomorrow data)
+        var now = new Date()
+        var isAfter1415 = now.getHours() > 14 || (now.getHours() === 14 && now.getMinutes() >= 15)
+        var needsForceRefresh = isAfter1415 && !tomorrowAvailable
+        
+        refreshData(needsForceRefresh)
 
         // Set up timer to update at next 14:15
         scheduleNextUpdate()
@@ -84,7 +90,8 @@ PlasmoidItem {
         interval: 0
         repeat: false
         onTriggered: {
-            refreshData()
+            console.log("Timer triggered - refreshing data")
+            refreshData(true)  // Force refresh at 14:15
             // After first update at 14:15, schedule next one for tomorrow
             scheduleNextUpdate()
         }
@@ -119,8 +126,9 @@ PlasmoidItem {
         root.nextUpdateTime = nextUpdate.toLocaleTimeString(Qt.locale(), { hour: '2-digit', minute: '2-digit' })
     }
     
-    function refreshData() {
+    function refreshData(forceRefresh) {
         PriceFetcher.fetchPrices(function(today, tomorrow) {
+            console.log("Price data received - today:", today.length, "tomorrow:", tomorrow.length)
             root.todayPrices = today
             root.tomorrowPrices = tomorrow
             // Check if tomorrow has actual prices (not just empty/zeros)
@@ -132,8 +140,9 @@ PlasmoidItem {
                 }
             }
             root.tomorrowAvailable = hasTomorrowPrices
+            console.log("Tomorrow available:", hasTomorrowPrices)
             updateCurrentPrice()
-        })
+        }, forceRefresh)
     }
     
     function updateCurrentPrice() {
