@@ -72,7 +72,7 @@ Item {
             id: minMaxRow
             Layout.alignment: Qt.AlignHCenter
             spacing: 24
-            visible: computedPrices.length > 0
+            visible: computedPrices.length > 0 && (!showingTomorrow || tomorrowAvailable)
 
             // Calculate min, max and averages (24h and 7-23 daytime)
             property var minMaxInfo: {
