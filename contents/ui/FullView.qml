@@ -22,11 +22,11 @@ Item {
     signal toggleDay()
     signal refreshRequested()
 
-    implicitWidth: 800
+    implicitWidth: 600
     implicitHeight: 400
     Layout.minimumWidth: 600
     Layout.minimumHeight: 280
-    Layout.preferredWidth: 800
+    Layout.preferredWidth: 600
     Layout.preferredHeight: 400
 
     Component.onCompleted: {
@@ -355,91 +355,190 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             visible: !showingTomorrow || tomorrowAvailable
-            
-            // Store maxPrice as a property accessible to children (with margin and fee)
-            property real maxPriceValue: {
-                var prices = showingTomorrow ? tomorrowPrices : todayPrices
-                var max = 0
-                var margin = FullView.priceMargin || 0
-                var fee = FullView.transferFee || 0
+
+            property int axisWidth: 44
+            property int axisGap: 8
+            property int chartPadding: 12
+            property int barSpacing: 4
+            property int idealBarWidth: 14
+            property real desiredPlotWidth: 24 * idealBarWidth + 23 * barSpacing
+            property real maxPlotWidth: Math.max(0, width - 2 * (chartPadding + axisWidth + axisGap))
+            property real plotWidth: Math.min(desiredPlotWidth, maxPlotWidth)
+
+            property var scaleInfo: {
+                var prices = computedPrices
+                var min = Infinity
+                var max = -Infinity
                 for (var i = 0; i < prices.length; i++) {
                     var price = prices[i]
                     if (typeof price !== 'number' || isNaN(price)) {
                         continue
                     }
-                    var totalPrice = price + margin + fee
-                    if (totalPrice > max) max = totalPrice
+                    if (price < min) min = price
+                    if (price > max) max = price
                 }
-                return Math.max(max, 0.1)
+                if (min === Infinity) {
+                    min = 0
+                    max = 1
+                }
+
+                var minScale = Math.min(0, min)
+                var maxScale = Math.max(0, max)
+                if (minScale === maxScale) {
+                    maxScale = minScale + 1
+                }
+
+                var range = maxScale - minScale
+                var step = 5
+                if (range <= 20) {
+                    step = 2
+                } else if (range <= 40) {
+                    step = 5
+                } else if (range <= 80) {
+                    step = 10
+                } else {
+                    step = 20
+                }
+
+                var start = Math.floor(minScale / step) * step
+                var end = Math.ceil(maxScale / step) * step
+                var ticks = []
+                for (var v = start; v <= end + 0.0001; v += step) {
+                    ticks.push(v)
+                }
+
+                return { minScale: start, maxScale: end, step: step, ticks: ticks }
             }
-            
-            Row {
+
+            function valueToY(value, height) {
+                var minScale = scaleInfo.minScale
+                var maxScale = scaleInfo.maxScale
+                return (maxScale - value) / (maxScale - minScale) * height
+            }
+
+            function zeroY(height) {
+                return valueToY(0, height)
+            }
+
+            Item {
+                id: chartContent
                 anchors.fill: parent
-                anchors.topMargin: 20
-                spacing: 4
-                
-                Repeater {
-                    id: chartRepeater
-                    // Use computedPrices which includes margin/fee - updates automatically
-                    model: computedPrices
 
-                    Column {
-                        id: column
-                        width: parent.width / 24 - 4
-                        height: parent.height - 20
-                        spacing: 4
+                Item {
+                    id: yAxis
+                    width: chartArea.axisWidth
+                    anchors.right: plotArea.left
+                    anchors.rightMargin: chartArea.axisGap
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
 
-                        property int hourIndex: index
-                        // modelData is already the computed price with margin/fee
-                        property real displayPrice: (typeof modelData === 'number' && !isNaN(modelData)) ? modelData : 0
-                        property real maxPrice: chartArea.maxPriceValue
-                        
-                        // Price label
+                    Repeater {
+                        model: chartArea.scaleInfo.ticks.length
                         Label {
-                            width: parent.width
-                            height: 14
-                            text: parent.displayPrice.toFixed(2)
+                            text: chartArea.scaleInfo.ticks[index].toFixed(0)
                             font.pixelSize: 9
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            visible: true
-                            font.bold: hourIndex === currentHour && !showingTomorrow
-                            color: hourIndex === currentHour && !showingTomorrow ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                            color: Kirigami.Theme.textColor
+                            anchors.right: parent.right
+                            rightPadding: 4
+                            y: barArea.y + chartArea.valueToY(chartArea.scaleInfo.ticks[index], barArea.height) - height / 2
                         }
-                        
-                        // Bar area
-                        Item {
-                            id: barContainer
-                            width: parent.width
-                            height: parent.height - 32
-                            
+                    }
+                }
+
+                Item {
+                    id: plotArea
+                    width: chartArea.plotWidth
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+
+                    Item {
+                        id: barArea
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.bottom: xAxis.top
+                        anchors.bottomMargin: 6
+
+                        property real barWidth: (width - 23 * chartArea.barSpacing) / 24
+
+                        Repeater {
+                            model: chartArea.scaleInfo.ticks.length
                             Rectangle {
-                                anchors.bottom: parent.bottom
                                 width: parent.width
-                                height: Math.min(parent.height - 2, Math.max(2, parent.height * (column.displayPrice / Math.max(column.maxPrice, 0.1))))
-                                color: {
-                                    if (hourIndex === currentHour && !showingTomorrow) {
-                                        // Current hour bar - use Plasma accent/highlight color
-                                        return Kirigami.Theme.highlightColor
-                                    }
-                                    return column.displayPrice < greenThreshold ? "#4CAF50" : column.displayPrice <= yellowThreshold ? "#FFC107" : "#F44336"
-                                }
-                                radius: 2
-                                border.width: hourIndex === currentHour && !showingTomorrow ? 2 : 0
-                                border.color: Kirigami.Theme.highlightColor
+                                height: 1
+                                color: Kirigami.Theme.textColor
+                                opacity: 0.1
+                                y: chartArea.valueToY(chartArea.scaleInfo.ticks[index], barArea.height)
                             }
                         }
-                        
-                        // Hour label
-                        Label {
+
+                        Rectangle {
                             width: parent.width
-                            height: 14
-                            text: hourIndex
-                            font.pixelSize: 9
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            font.bold: hourIndex === currentHour && !showingTomorrow
-                            color: hourIndex === currentHour && !showingTomorrow ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                            height: 1
+                            color: Kirigami.Theme.textColor
+                            opacity: 0.25
+                            y: chartArea.zeroY(barArea.height)
+                            visible: chartArea.scaleInfo.minScale < 0 && chartArea.scaleInfo.maxScale > 0
+                        }
+
+                        Row {
+                            anchors.fill: parent
+                            spacing: chartArea.barSpacing
+
+                            Repeater {
+                                id: chartRepeater
+                                model: computedPrices
+
+                                Item {
+                                    width: barArea.barWidth
+                                    height: parent.height
+
+                                    property int hourIndex: index
+                                    property real displayPrice: (typeof modelData === 'number' && !isNaN(modelData)) ? modelData : 0
+                                    property real zeroLineY: chartArea.zeroY(parent.height)
+                                    property real valueY: chartArea.valueToY(displayPrice, parent.height)
+
+                                    Rectangle {
+                                        width: parent.width
+                                        height: Math.max(2, Math.abs(parent.zeroLineY - parent.valueY))
+                                        y: parent.displayPrice >= 0 ? parent.valueY : parent.zeroLineY
+                                        color: {
+                                            if (parent.hourIndex === currentHour && !showingTomorrow) {
+                                                return Kirigami.Theme.highlightColor
+                                            }
+                                            if (parent.displayPrice < 0) {
+                                                return "#2196F3"
+                                            }
+                                            return parent.displayPrice < greenThreshold ? "#4CAF50" : parent.displayPrice <= yellowThreshold ? "#FFC107" : "#F44336"
+                                        }
+                                        radius: 2
+                                        border.width: parent.hourIndex === currentHour && !showingTomorrow ? 2 : 0
+                                        border.color: Kirigami.Theme.highlightColor
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Row {
+                        id: xAxis
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        height: 14
+                        spacing: chartArea.barSpacing
+
+                        Repeater {
+                            model: 12
+                            Label {
+                                width: barArea.barWidth * 2 + chartArea.barSpacing
+                                text: index * 2
+                                font.pixelSize: 9
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                color: Kirigami.Theme.textColor
+                            }
                         }
                     }
                 }
