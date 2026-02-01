@@ -6,6 +6,7 @@ A KDE Plasma 6 widget for displaying Finnish electricity spot prices from spot-h
 
 - **Compact view (Taskbar)**: Shows current price with color indicator
 - **Full view (Desktop)**: Bar chart of today's/tomorrow's hourly prices
+- **Price statistics**: Shows cheapest hour, most expensive hour, and 24h average price (includes margin and transfer fee)
 - **Color indicators** (customizable):
   - 🟢 Green: < 10 c/kWh (cheap)
   - 🟡 Yellow: 10-20 c/kWh (moderate)
