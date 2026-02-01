@@ -521,23 +521,29 @@ Item {
                         }
                     }
 
-                    Row {
+                    Item {
                         id: xAxis
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         height: 14
-                        spacing: chartArea.barSpacing
 
                         Repeater {
-                            model: 12
-                            Label {
-                                width: barArea.barWidth * 2 + chartArea.barSpacing
-                                text: index * 2
-                                font.pixelSize: 9
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                color: Kirigami.Theme.textColor
+                            model: 24
+                            Item {
+                                width: barArea.barWidth
+                                height: parent.height
+                                x: index * (barArea.barWidth + chartArea.barSpacing)
+                                visible: index % 2 === 0
+
+                                Label {
+                                    anchors.centerIn: parent
+                                    text: index
+                                    font.pixelSize: 9
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                    color: Kirigami.Theme.textColor
+                                }
                             }
                         }
                     }
