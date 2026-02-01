@@ -87,3 +87,6 @@ msgstr "Average 7-23"
 
 msgid "Average 24h"
 msgstr "Average 24h"
+
+msgid "%1-%2"
+msgstr "%1 - %2"

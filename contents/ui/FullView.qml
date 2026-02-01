@@ -139,7 +139,7 @@ Item {
                         spacing: 4
                         anchors.horizontalCenter: parent.horizontalCenter
                     Label {
-                        text: "klo " + minMaxRow.minMaxInfo.minHour
+                        text: minMaxRow.minMaxInfo.minHour + " - " + (minMaxRow.minMaxInfo.minHour + 1)
                         font.pixelSize: 12
                         font.bold: true
                         color: "#2E7D32"
@@ -249,7 +249,7 @@ Item {
                         spacing: 4
                         anchors.horizontalCenter: parent.horizontalCenter
                     Label {
-                        text: "klo " + minMaxRow.minMaxInfo.maxHour
+                        text: minMaxRow.minMaxInfo.maxHour + " - " + (minMaxRow.minMaxInfo.maxHour + 1)
                         font.pixelSize: 12
                         font.bold: true
                         color: "#C62828"
