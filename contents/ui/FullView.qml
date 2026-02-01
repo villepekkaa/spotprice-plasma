@@ -66,6 +66,168 @@ Item {
                 onClicked: toggleDay()
             }
         }
+
+        // Min/Max price info - centered
+        Row {
+            id: minMaxRow
+            Layout.alignment: Qt.AlignHCenter
+            spacing: 24
+            visible: computedPrices.length > 0
+
+            // Calculate min, max and average
+            property var minMaxInfo: {
+                var prices = computedPrices
+                var minPrice = Infinity
+                var maxPrice = -Infinity
+                var minHour = -1
+                var maxHour = -1
+                var sum = 0
+                var count = 0
+
+                for (var i = 0; i < prices.length; i++) {
+                    var price = prices[i] || 0
+                    sum += price
+                    count++
+                    if (price < minPrice) {
+                        minPrice = price
+                        minHour = i
+                    }
+                    if (price > maxPrice) {
+                        maxPrice = price
+                        maxHour = i
+                    }
+                }
+
+                return {
+                    minPrice: minPrice === Infinity ? 0 : minPrice,
+                    maxPrice: maxPrice === -Infinity ? 0 : maxPrice,
+                    avgPrice: count > 0 ? sum / count : 0,
+                    minHour: minHour,
+                    maxHour: maxHour
+                }
+            }
+
+            // Cheapest hour
+            Rectangle {
+                width: minCol.width + 16
+                height: minCol.height + 12
+                color: Qt.rgba(0.29, 0.68, 0.31, 0.15)  // #4CAF50 with 15% opacity
+                radius: 6
+                border.width: 1
+                border.color: Qt.rgba(0.29, 0.68, 0.31, 0.3)
+
+                Column {
+                    id: minCol
+                    anchors.centerIn: parent
+                    spacing: 2
+
+                    Label {
+                        text: i18n("Cheapest")
+                        font.pixelSize: 10
+                        color: "#388E3C"
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                    Row {
+                        spacing: 4
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    Label {
+                        text: "klo " + minMaxRow.minMaxInfo.minHour
+                        font.pixelSize: 12
+                        font.bold: true
+                        color: "#2E7D32"
+                    }
+                        Label {
+                            text: "•"
+                            font.pixelSize: 12
+                            color: "#388E3C"
+                        }
+                        Label {
+                            text: minMaxRow.minMaxInfo.minPrice.toFixed(1) + " c/kWh"
+                            font.pixelSize: 12
+                            font.bold: true
+                            color: "#2E7D32"
+                        }
+                    }
+                }
+            }
+
+            // Average price
+            Rectangle {
+                width: avgCol.width + 16
+                height: avgCol.height + 12
+                color: Qt.rgba(0.13, 0.59, 0.95, 0.15)  // #2196F3 with 15% opacity
+                radius: 6
+                border.width: 1
+                border.color: Qt.rgba(0.13, 0.59, 0.95, 0.3)
+
+                Column {
+                    id: avgCol
+                    anchors.centerIn: parent
+                    spacing: 2
+
+                    Label {
+                        text: i18n("Average")
+                        font.pixelSize: 10
+                        color: "#1976D2"
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                    Row {
+                        spacing: 4
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        Label {
+                            text: minMaxRow.minMaxInfo.avgPrice.toFixed(1) + " c/kWh"
+                            font.pixelSize: 12
+                            font.bold: true
+                            color: "#1565C0"
+                        }
+                    }
+                }
+            }
+
+            // Most expensive hour
+            Rectangle {
+                width: maxCol.width + 16
+                height: maxCol.height + 12
+                color: Qt.rgba(0.96, 0.26, 0.21, 0.15)  // #F44336 with 15% opacity
+                radius: 6
+                border.width: 1
+                border.color: Qt.rgba(0.96, 0.26, 0.21, 0.3)
+
+                Column {
+                    id: maxCol
+                    anchors.centerIn: parent
+                    spacing: 2
+
+                    Label {
+                        text: i18n("Most expensive")
+                        font.pixelSize: 10
+                        color: "#D32F2F"
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                    Row {
+                        spacing: 4
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    Label {
+                        text: "klo " + minMaxRow.minMaxInfo.maxHour
+                        font.pixelSize: 12
+                        font.bold: true
+                        color: "#C62828"
+                    }
+                        Label {
+                            text: "•"
+                            font.pixelSize: 12
+                            color: "#D32F2F"
+                        }
+                        Label {
+                            text: minMaxRow.minMaxInfo.maxPrice.toFixed(1) + " c/kWh"
+                            font.pixelSize: 12
+                            font.bold: true
+                            color: "#C62828"
+                        }
+                    }
+                }
+            }
+        }
         
         // Tomorrow not available message
         Item {

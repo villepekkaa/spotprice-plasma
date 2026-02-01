@@ -75,3 +75,12 @@ msgstr "Siirtohinta (c/kWh):"
 #: contents/ui/ConfigGeneral.qml:121
 msgid "This transfer fee is added to all displayed prices"
 msgstr "Tämä siirtohinta lisätään kaikkiin näytettäviin hintoihin"
+
+msgid "Cheapest"
+msgstr "Halvin"
+
+msgid "Most expensive"
+msgstr "Kallein"
+
+msgid "Average"
+msgstr "Keskiarvo"

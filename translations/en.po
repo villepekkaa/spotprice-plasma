@@ -75,3 +75,12 @@ msgstr "Transfer fee (c/kWh):"
 #: contents/ui/ConfigGeneral.qml:121
 msgid "This transfer fee is added to all displayed prices"
 msgstr "This transfer fee is added to all displayed prices"
+
+msgid "Cheapest"
+msgstr "Cheapest"
+
+msgid "Most expensive"
+msgstr "Most expensive"
+
+msgid "Average"
+msgstr "Average"
