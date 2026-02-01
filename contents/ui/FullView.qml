@@ -212,7 +212,7 @@ Item {
                             color: "#388E3C"
                         }
                         Label {
-                            text: minMaxRow.minMaxInfo.minPrice.toFixed(1) + " c/kWh"
+                            text: minMaxRow.minMaxInfo.minPrice.toFixed(2) + " c/kWh"
                             font.pixelSize: 12
                             font.bold: true
                             color: "#2E7D32"
@@ -245,7 +245,7 @@ Item {
                         spacing: 4
                         anchors.horizontalCenter: parent.horizontalCenter
                         Label {
-                            text: minMaxRow.minMaxInfo.avgPriceDaytime.toFixed(1) + " c/kWh"
+                            text: minMaxRow.minMaxInfo.avgPriceDaytime.toFixed(2) + " c/kWh"
                             font.pixelSize: 12
                             font.bold: true
                             color: "#1565C0"
@@ -278,7 +278,7 @@ Item {
                         spacing: 4
                         anchors.horizontalCenter: parent.horizontalCenter
                         Label {
-                            text: minMaxRow.minMaxInfo.avgPrice24h.toFixed(1) + " c/kWh"
+                            text: minMaxRow.minMaxInfo.avgPrice24h.toFixed(2) + " c/kWh"
                             font.pixelSize: 12
                             font.bold: true
                             color: "#1565C0"
@@ -322,7 +322,7 @@ Item {
                             color: "#D32F2F"
                         }
                         Label {
-                            text: minMaxRow.minMaxInfo.maxPrice.toFixed(1) + " c/kWh"
+                            text: minMaxRow.minMaxInfo.maxPrice.toFixed(2) + " c/kWh"
                             font.pixelSize: 12
                             font.bold: true
                             color: "#C62828"
@@ -398,7 +398,7 @@ Item {
                         Label {
                             width: parent.width
                             height: 14
-                            text: parent.displayPrice.toFixed(1)
+                            text: parent.displayPrice.toFixed(2)
                             font.pixelSize: 9
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
