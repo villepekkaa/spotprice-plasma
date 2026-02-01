@@ -87,3 +87,6 @@ msgstr "Keskihinta 7-23"
 
 msgid "Average 24h"
 msgstr "Keskihinta 24h"
+
+msgid "%1-%2"
+msgstr "klo %1 - %2"
