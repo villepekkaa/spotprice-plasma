@@ -22,11 +22,11 @@ Item {
     signal toggleDay()
     signal refreshRequested()
 
-    implicitWidth: 600
+    implicitWidth: 800
     implicitHeight: 400
-    Layout.minimumWidth: 400
+    Layout.minimumWidth: 600
     Layout.minimumHeight: 280
-    Layout.preferredWidth: 600
+    Layout.preferredWidth: 800
     Layout.preferredHeight: 400
 
     Component.onCompleted: {
