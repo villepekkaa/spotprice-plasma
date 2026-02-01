@@ -173,9 +173,11 @@ qml6 -typeinfo contents/ui/main.qml
 1. Create feature branch
 2. Make changes
 3. Test locally
-4. Commit with descriptive message
+4. Commit with descriptive message (in **English**)
 5. Push to GitHub
 6. Create PR if needed
+
+**Note**: All commit messages must be in English, even when communicating in Finnish. This ensures consistency in the git history and makes the project accessible to international contributors.
 
 ## Questions?
 

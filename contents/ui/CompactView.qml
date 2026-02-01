@@ -16,30 +16,33 @@ Item {
     Layout.preferredWidth: 115
     
     MouseArea {
+        id: mouseArea
         anchors.fill: parent
+        hoverEnabled: true
         onClicked: parent.clicked()
-    }
 
-    Rectangle {
-        anchors.fill: parent
-        color: "transparent"
-        radius: 4
-        
-        RowLayout {
-            anchors.centerIn: parent
-            spacing: 4
+        Rectangle {
+            anchors.fill: parent
+            color: "transparent"
+            radius: 4
             
-            Label {
-                text: "⚡\uFE0E"
-                font.pixelSize: 26
-                color: Kirigami.Theme.textColor
-            }
-            
-            Label {
-                text: (price < 1 ? price.toFixed(2) : price.toFixed(1)) + " " + i18n("c/kWh")
-                font.pixelSize: 14
-                font.weight: Font.Medium
-                color: Kirigami.Theme.textColor
+            RowLayout {
+                anchors.centerIn: parent
+                spacing: 4
+                
+                Label {
+                    text: "⚡\uFE0E"
+                    font.pixelSize: 26
+                    color: Kirigami.Theme.textColor
+                    opacity: mouseArea.containsMouse ? 1.0 : 0.5
+                }
+                
+                Label {
+                    text: (price < 1 ? price.toFixed(2) : price.toFixed(1)) + " " + i18n("c/kWh")
+                    font.pixelSize: 14
+                    font.weight: Font.Medium
+                    color: Kirigami.Theme.textColor
+                }
             }
         }
     }
