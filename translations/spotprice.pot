@@ -1,0 +1,107 @@
+# Translations template for SpotPrice widget
+# Copyright (C) 2026 Ville-Pekka Alavuotunki
+# This file is distributed under the same license as the SpotPrice package.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: spotprice-widget 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/villepekkaa/spotprice-plasma/issues\n"
+"POT-Creation-Date: 2026-02-02 12:34+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+
+#: contents/ui/CompactView.qml:41
+msgid "c/kWh"
+msgstr ""
+
+#: contents/ui/ConfigGeneral.qml:15
+msgid "General"
+msgstr ""
+
+#: contents/ui/ConfigGeneral.qml:37
+msgid "General Settings"
+msgstr ""
+
+#: contents/ui/ConfigGeneral.qml:58
+msgid "Price Thresholds (c/kWh)"
+msgstr ""
+
+#: contents/ui/ConfigGeneral.qml:65
+msgid "Green threshold:"
+msgstr ""
+
+#: contents/ui/ConfigGeneral.qml:79
+msgid "Yellow threshold:"
+msgstr ""
+
+#: contents/ui/ConfigGeneral.qml:93
+msgid "Red threshold:"
+msgstr ""
+
+#: contents/ui/ConfigGeneral.qml:107
+msgid "Price Margin"
+msgstr ""
+
+#: contents/ui/ConfigGeneral.qml:114
+msgid "Margin (c/kWh):"
+msgstr ""
+
+#: contents/ui/ConfigGeneral.qml:127
+msgid "This margin is added to all displayed prices"
+msgstr ""
+
+#: contents/ui/ConfigGeneral.qml:134
+msgid "Transfer Fee"
+msgstr ""
+
+#: contents/ui/ConfigGeneral.qml:141
+msgid "Transfer fee (c/kWh):"
+msgstr ""
+
+#: contents/ui/ConfigGeneral.qml:154
+msgid "This transfer fee is added to all displayed prices"
+msgstr ""
+
+#: contents/ui/FullView.qml:144
+msgid "c/kWh"
+msgstr ""
+
+#: contents/ui/FullView.qml:157
+msgid "Tomorrow"
+msgstr ""
+
+#: contents/ui/FullView.qml:254
+msgid "Cheapest"
+msgstr ""
+
+#: contents/ui/FullView.qml:298
+msgid "Average 7-23"
+msgstr ""
+
+#: contents/ui/FullView.qml:331
+msgid "Average 24h"
+msgstr ""
+
+#: contents/ui/FullView.qml:364
+msgid "Most expensive"
+msgstr ""
+
+#: contents/ui/FullView.qml:403
+msgid "Tomorrow's prices available around 14:15"
+msgstr ""
+
+#: contents/ui/FullView.qml:697
+msgid "Tomorrow"
+msgstr ""
+
+#: contents/config/config.qml:6
+msgid "General"
+msgstr ""

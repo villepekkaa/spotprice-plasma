@@ -106,8 +106,8 @@ msgstr "Current price"
 msgid "Price"
 msgstr "Price"
 
-msgid "Now %1 - %2"
-msgstr "Now %1 - %2"
+msgid "Price %1 - %2"
+msgstr "Price %1 - %2"
 
 msgid "%1-%2"
 msgstr "%1 - %2"

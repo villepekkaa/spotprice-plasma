@@ -106,8 +106,8 @@ msgstr "Nykyinen hinta"
 msgid "Price"
 msgstr "Hinta"
 
-msgid "Now %1 - %2"
-msgstr "Nyt %1 - %2"
+msgid "Price %1 - %2"
+msgstr "Hinta %1 - %2"
 
 msgid "%1-%2"
 msgstr "klo %1 - %2"

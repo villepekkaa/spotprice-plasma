@@ -109,8 +109,8 @@ Item {
                 border.width: 2
                 radius: 8
                 anchors.centerIn: parent
-                implicitWidth: nowPriceCol.width + 20
-                implicitHeight: nowPriceCol.height + 16
+                 implicitWidth: nowPriceCol.width + 12
+                implicitHeight: nowPriceCol.height + 8
 
                 Column {
                     id: nowPriceCol
@@ -119,7 +119,7 @@ Item {
 
                     // Current hour info: "Now 9 - 10"
                     Label {
-                        text: i18n("Now %1 - %2", currentHour, currentHour + 1)
+                        text: i18n("Price %1 - %2", currentHour, currentHour + 1)
                         font.pixelSize: 12
                         color: Kirigami.Theme.textColor
                         opacity: 0.7
@@ -134,7 +134,7 @@ Item {
 
                         Label {
                             text: currentDisplayPrice.toFixed(2)
-                            font.pixelSize: 20
+                            font.pixelSize: 16
                             font.bold: true
                             color: currentPriceStyle.text
                             anchors.verticalCenter: parent.verticalCenter
