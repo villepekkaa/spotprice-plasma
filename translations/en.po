@@ -16,6 +16,9 @@ msgstr ""
 msgid "Today"
 msgstr "Today"
 
+msgid "Now"
+msgstr "Now"
+
 #: contents/ui/FullView.qml:45
 msgid "Tomorrow"
 msgstr "Tomorrow"
@@ -96,6 +99,15 @@ msgstr "Next update %1"
 
 msgid "Update failed (%1), using cached prices"
 msgstr "Update failed (%1), using cached prices"
+
+msgid "Current price"
+msgstr "Current price"
+
+msgid "Price"
+msgstr "Price"
+
+msgid "Now %1 - %2"
+msgstr "Now %1 - %2"
 
 msgid "%1-%2"
 msgstr "%1 - %2"

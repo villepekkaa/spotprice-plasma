@@ -49,57 +49,116 @@ Item {
         }
         return result
     }
+
+    property bool hasCurrentPrice: !showingTomorrow
+        && currentHour >= 0
+        && currentHour < computedPrices.length
+        && typeof computedPrices[currentHour] === "number"
+        && !isNaN(computedPrices[currentHour])
+    property real currentDisplayPrice: hasCurrentPrice ? computedPrices[currentHour] : 0
+    property var currentPriceStyle: hasCurrentPrice ? priceStyle(currentDisplayPrice) : ({
+        bg: "transparent",
+        border: "transparent",
+        text: Kirigami.Theme.textColor
+    })
+
+    function priceStyle(price) {
+        if (price < 0) {
+            return {
+                bg: Qt.rgba(0.13, 0.59, 0.95, 0.12),
+                border: Qt.rgba(0.13, 0.59, 0.95, 0.25),
+                text: "#1565C0"
+            }
+        }
+        if (price < greenThreshold) {
+            return {
+                bg: Qt.rgba(0.29, 0.68, 0.31, 0.12),
+                border: Qt.rgba(0.29, 0.68, 0.31, 0.3),
+                text: "#2E7D32"
+            }
+        }
+        if (price <= yellowThreshold) {
+            return {
+                bg: Qt.rgba(1, 0.76, 0.03, 0.14),
+                border: Qt.rgba(1, 0.76, 0.03, 0.35),
+                text: "#F57F17"
+            }
+        }
+        return {
+            bg: Qt.rgba(0.96, 0.26, 0.21, 0.12),
+            border: Qt.rgba(0.96, 0.26, 0.21, 0.3),
+            text: "#C62828"
+        }
+    }
     
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 16
-        spacing: 12
+        spacing: 8
         
-        // Header with title, status info and day toggle
-        RowLayout {
+        // Header: Now with current hour and price (centered)
+        Item {
             Layout.fillWidth: true
             Layout.minimumHeight: 50
-            spacing: 8
-            
-            // Left side: status info
-            ColumnLayout {
-                spacing: 2
-                Layout.alignment: Qt.AlignVCenter
-                
-                Label {
-                    text: lastUpdateTime ? i18n("Last update %1", lastUpdateTime) : ""
-                    font.pixelSize: 10
-                    color: Kirigami.Theme.textColor
-                    visible: lastUpdateTime.length > 0
-                }
-                
-                Label {
-                    text: nextUpdateTime ? i18n("Next update %1", nextUpdateTime) : ""
-                    font.pixelSize: 10
-                    color: Kirigami.Theme.textColor
-                    visible: nextUpdateTime.length > 0
+
+            // Center: Now with current hour and price (in bordered box)
+            Rectangle {
+                visible: !showingTomorrow && hasCurrentPrice
+                color: currentPriceStyle.bg
+                border.color: currentPriceStyle.border
+                border.width: 2
+                radius: 8
+                anchors.centerIn: parent
+                implicitWidth: nowPriceCol.width + 20
+                implicitHeight: nowPriceCol.height + 16
+
+                Column {
+                    id: nowPriceCol
+                    spacing: 2
+                    anchors.centerIn: parent
+
+                    // Current hour info: "Now 9 - 10"
+                    Label {
+                        text: i18n("Now %1 - %2", currentHour, currentHour + 1)
+                        font.pixelSize: 12
+                        color: Kirigami.Theme.textColor
+                        opacity: 0.7
+                        horizontalAlignment: Text.AlignHCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    // Price
+                    Row {
+                        spacing: 6
+                        anchors.horizontalCenter: parent.horizontalCenter
+
+                        Label {
+                            text: currentDisplayPrice.toFixed(2)
+                            font.pixelSize: 20
+                            font.bold: true
+                            color: currentPriceStyle.text
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Label {
+                            text: i18n("c/kWh")
+                            font.pixelSize: 12
+                            color: Kirigami.Theme.textColor
+                            opacity: 0.7
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.verticalCenterOffset: 2
+                        }
+                    }
                 }
             }
 
-            Item { Layout.fillWidth: true }
-
-            // Center: Title
+            // Tomorrow title (centered when showing tomorrow)
             Label {
-                text: showingTomorrow ? i18n("Tomorrow") : i18n("Today")
+                text: i18n("Tomorrow")
                 font.pixelSize: 18
                 font.bold: true
-                Layout.alignment: Qt.AlignVCenter
-            }
-
-            Item { Layout.fillWidth: true }
-
-            // Right side: Toggle button
-            PlasmaComponents.Button {
-                text: showingTomorrow ? i18n("Today") : i18n("Tomorrow")
-                enabled: true
-                opacity: tomorrowAvailable || showingTomorrow ? 1.0 : 0.5
-                onClicked: toggleDay()
-                Layout.alignment: Qt.AlignVCenter
+                anchors.centerIn: parent
+                visible: showingTomorrow
             }
         }
 
@@ -181,10 +240,10 @@ Item {
             Rectangle {
                 width: minCol.width + 16
                 height: minCol.height + 12
-                color: Qt.rgba(0.29, 0.68, 0.31, 0.15)  // #4CAF50 with 15% opacity
+                color: Qt.rgba(0.13, 0.59, 0.95, 0.10)
                 radius: 6
                 border.width: 1
-                border.color: Qt.rgba(0.29, 0.68, 0.31, 0.3)
+                border.color: Qt.rgba(0.13, 0.59, 0.95, 0.2)
 
                 Column {
                     id: minCol
@@ -194,7 +253,7 @@ Item {
                     Label {
                         text: i18n("Cheapest")
                         font.pixelSize: 10
-                        color: "#388E3C"
+                        color: "#1976D2"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Row {
@@ -204,18 +263,18 @@ Item {
                         text: minMaxRow.minMaxInfo.minHour + " - " + (minMaxRow.minMaxInfo.minHour + 1)
                         font.pixelSize: 12
                         font.bold: true
-                        color: "#2E7D32"
+                        color: "#1565C0"
                     }
                         Label {
                             text: "•"
                             font.pixelSize: 12
-                            color: "#388E3C"
+                            color: "#1976D2"
                         }
                         Label {
                             text: minMaxRow.minMaxInfo.minPrice.toFixed(2) + " c/kWh"
                             font.pixelSize: 12
                             font.bold: true
-                            color: "#2E7D32"
+                            color: "#1565C0"
                         }
                     }
                 }
@@ -291,10 +350,10 @@ Item {
             Rectangle {
                 width: maxCol.width + 16
                 height: maxCol.height + 12
-                color: Qt.rgba(0.96, 0.26, 0.21, 0.15)  // #F44336 with 15% opacity
+                color: Qt.rgba(0.13, 0.59, 0.95, 0.10)
                 radius: 6
                 border.width: 1
-                border.color: Qt.rgba(0.96, 0.26, 0.21, 0.3)
+                border.color: Qt.rgba(0.13, 0.59, 0.95, 0.2)
 
                 Column {
                     id: maxCol
@@ -304,7 +363,7 @@ Item {
                     Label {
                         text: i18n("Most expensive")
                         font.pixelSize: 10
-                        color: "#D32F2F"
+                        color: "#1976D2"
                         horizontalAlignment: Text.AlignHCenter
                     }
                     Row {
@@ -314,18 +373,18 @@ Item {
                         text: minMaxRow.minMaxInfo.maxHour + " - " + (minMaxRow.minMaxInfo.maxHour + 1)
                         font.pixelSize: 12
                         font.bold: true
-                        color: "#C62828"
+                        color: "#1565C0"
                     }
                         Label {
                             text: "•"
                             font.pixelSize: 12
-                            color: "#D32F2F"
+                            color: "#1976D2"
                         }
                         Label {
                             text: minMaxRow.minMaxInfo.maxPrice.toFixed(2) + " c/kWh"
                             font.pixelSize: 12
                             font.bold: true
-                            color: "#C62828"
+                            color: "#1565C0"
                         }
                     }
                 }
@@ -551,57 +610,96 @@ Item {
             }
         }
         
-        // Legend
-        Row {
-            Layout.alignment: Qt.AlignHCenter
-            spacing: 20
-            
-            Row {
-                spacing: 6
-                Rectangle {
-                    width: 14
-                    height: 14
-                    color: "#4CAF50"
-                    radius: 2
-                    anchors.verticalCenter: parent.verticalCenter
-                }
+        // Legend + status (bottom row)
+        Item {
+            Layout.fillWidth: true
+            Layout.minimumHeight: Math.max(legendRow.height, statusColumn.implicitHeight)
+
+            ColumnLayout {
+                id: statusColumn
+                spacing: 2
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                visible: lastUpdateTime.length > 0 || nextUpdateTime.length > 0
+
                 Label {
-                    text: "< " + greenThreshold + "c"
-                    font.pixelSize: 11
-                    anchors.verticalCenter: parent.verticalCenter
+                    text: lastUpdateTime ? i18n("Last update %1", lastUpdateTime) : ""
+                    font.pixelSize: 10
+                    color: Kirigami.Theme.textColor
+                    visible: lastUpdateTime.length > 0
+                }
+
+                Label {
+                    text: nextUpdateTime ? i18n("Next update %1", nextUpdateTime) : ""
+                    font.pixelSize: 10
+                    color: Kirigami.Theme.textColor
+                    visible: nextUpdateTime.length > 0
                 }
             }
-            
+
             Row {
-                spacing: 6
-                Rectangle {
-                    width: 14
-                    height: 14
-                    color: "#FFC107"
-                    radius: 2
-                    anchors.verticalCenter: parent.verticalCenter
+                id: legendRow
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 20
+
+                Row {
+                    spacing: 6
+                    Rectangle {
+                        width: 14
+                        height: 14
+                        color: "#4CAF50"
+                        radius: 2
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    Label {
+                        text: "< " + greenThreshold + "c"
+                        font.pixelSize: 11
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
                 }
-                Label {
-                    text: greenThreshold + "-" + yellowThreshold + "c"
-                    font.pixelSize: 11
-                    anchors.verticalCenter: parent.verticalCenter
+
+                Row {
+                    spacing: 6
+                    Rectangle {
+                        width: 14
+                        height: 14
+                        color: "#FFC107"
+                        radius: 2
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    Label {
+                        text: greenThreshold + "-" + yellowThreshold + "c"
+                        font.pixelSize: 11
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                Row {
+                    spacing: 6
+                    Rectangle {
+                        width: 14
+                        height: 14
+                        color: "#F44336"
+                        radius: 2
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    Label {
+                        text: "> " + yellowThreshold + "c"
+                        font.pixelSize: 11
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
                 }
             }
-            
-            Row {
-                spacing: 6
-                Rectangle {
-                    width: 14
-                    height: 14
-                    color: "#F44336"
-                    radius: 2
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-                Label {
-                    text: "> " + yellowThreshold + "c"
-                    font.pixelSize: 11
-                    anchors.verticalCenter: parent.verticalCenter
-                }
+
+            // Toggle button (bottom right)
+            PlasmaComponents.Button {
+                text: showingTomorrow ? i18n("Today") : i18n("Tomorrow")
+                enabled: true
+                opacity: tomorrowAvailable || showingTomorrow ? 1.0 : 0.5
+                onClicked: toggleDay()
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
             }
         }
     }
