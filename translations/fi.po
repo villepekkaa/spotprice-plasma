@@ -16,6 +16,9 @@ msgstr ""
 msgid "Today"
 msgstr "Tänään"
 
+msgid "Now"
+msgstr "Nyt"
+
 #: contents/ui/FullView.qml:45
 msgid "Tomorrow"
 msgstr "Huomenna"
@@ -87,6 +90,24 @@ msgstr "Keskihinta 7-23"
 
 msgid "Average 24h"
 msgstr "Keskihinta 24h"
+
+msgid "Last update %1"
+msgstr "Viimeisin päivitys %1"
+
+msgid "Next update %1"
+msgstr "Seuraava päivitys %1"
+
+msgid "Update failed (%1), using cached prices"
+msgstr "Päivitys epäonnistui (%1), käytetään välimuistia"
+
+msgid "Current price"
+msgstr "Nykyinen hinta"
+
+msgid "Price"
+msgstr "Hinta"
+
+msgid "Price %1 - %2"
+msgstr "Hinta %1 - %2"
 
 msgid "%1-%2"
 msgstr "klo %1 - %2"

@@ -44,7 +44,8 @@ PlasmoidItem {
 
     // Track expanded state to sync data
     onExpandedChanged: {
-        if (expanded) {
+        if (root.expanded) {
+            refreshData(false)
             Qt.callLater(updateCurrentPrice)
         }
     }
@@ -62,27 +63,33 @@ PlasmoidItem {
         greenThreshold: root.greenThreshold
         yellowThreshold: root.yellowThreshold
         redThreshold: root.redThreshold
+        lastUpdateTime: root.lastUpdateTime
+        nextUpdateTime: root.nextUpdateTime
+        lastErrorMessage: root.lastErrorMessage
         onToggleDay: root.toggleDay()
-        onRefreshRequested: updateCurrentPrice()
+        onRefreshRequested: refreshData(false)
     }
     
     // Property for next update time display
     property string nextUpdateTime: ""
     property int lastKnownHour: -1
     property string lastKnownDate: ""
+    property string lastUpdateTime: ""
+    property string lastErrorMessage: ""
     
     Component.onCompleted: {
         PriceFetcher.initialize()
         var now = new Date()
         lastKnownHour = now.getHours()
         lastKnownDate = formatDate(now)
+        updateStatusTimes()
         
         // Check if we need to force refresh (after 14:15 without tomorrow data)
-        var now = new Date()
         var isAfter1415 = now.getHours() > 14 || (now.getHours() === 14 && now.getMinutes() >= 15)
         var needsForceRefresh = isAfter1415 && !tomorrowAvailable
         
-        refreshData(needsForceRefresh)
+        refreshData(true)
+        updateCurrentPrice()
 
         // Set up timer to update at next 14:15
         scheduleNextUpdate()
@@ -116,6 +123,11 @@ PlasmoidItem {
                 console.log("Day changed from", root.lastKnownDate, "to", currentDate, "- fetching new prices")
                 root.lastKnownDate = currentDate
                 root.lastKnownHour = currentHour
+                var rolled = PriceFetcher.rolloverToToday({ date: root.lastKnownDate, today: root.todayPrices, tomorrow: root.tomorrowPrices })
+                if (rolled) {
+                    root.todayPrices = rolled.today
+                    root.tomorrowPrices = rolled.tomorrow
+                }
                 refreshData(true) // Force refresh on day change
                 return
             }
@@ -138,7 +150,7 @@ PlasmoidItem {
         
         // Update display with system locale
         var nextUpdate = new Date(Date.now() + msUntil1415)
-        root.nextUpdateTime = nextUpdate.toLocaleTimeString(Qt.locale(), { hour: '2-digit', minute: '2-digit' })
+        root.nextUpdateTime = Qt.formatTime(nextUpdate, Qt.locale().timeFormat(Locale.ShortFormat))
     }
     
     function refreshData(forceRefresh) {
@@ -146,6 +158,7 @@ PlasmoidItem {
             console.log("Price data received - today:", today.length, "tomorrow:", tomorrow.length)
             root.todayPrices = today
             root.tomorrowPrices = tomorrow
+            updateStatusTimes()
             // Check if tomorrow has actual prices (not just empty/zeros)
             var hasTomorrowPrices = false
             for (var i = 0; i < tomorrow.length; i++) {
@@ -186,6 +199,14 @@ PlasmoidItem {
     function toggleDay() {
         root.showingTomorrow = !root.showingTomorrow
         updateCurrentPrice()
+    }
+
+    function updateStatusTimes() {
+        var lastUpdate = PriceFetcher.getLastUpdateTime()
+        if (lastUpdate) {
+            root.lastUpdateTime = Qt.formatTime(new Date(lastUpdate), Qt.locale().timeFormat(Locale.ShortFormat))
+        }
+        root.lastErrorMessage = PriceFetcher.getLastError() || ""
     }
     
     function formatDate(date) {

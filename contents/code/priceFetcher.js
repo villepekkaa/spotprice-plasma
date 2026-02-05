@@ -4,6 +4,9 @@
 
 var cachedData = null
 var cacheFile = null
+var lastFetchTimestamp = 0
+var lastError = ""
+var lastErrorAt = 0
 
 function initialize() {
     // Set up cache file path in Plasma's standard cache location
@@ -13,6 +16,9 @@ function initialize() {
     }
     // Load existing cache from file
     cachedData = loadCachedPrices()
+    if (cachedData && cachedData.timestamp) {
+        lastFetchTimestamp = cachedData.timestamp
+    }
 }
 
 function fetchPrices(callback, forceRefresh) {
@@ -39,6 +45,12 @@ function fetchPrices(callback, forceRefresh) {
     if (isAfter1415 && !hasTomorrowData) {
         console.log("Fetching prices: after 14:15 and no tomorrow data")
         fetchFromAPI(callback)
+        return
+    }
+
+    if (!forceRefresh && shouldThrottleFetch()) {
+        console.log("Using cached prices (throttled)")
+        callback(cached.today, cached.tomorrow)
         return
     }
     
@@ -76,6 +88,7 @@ function fetchFromAPI(callback) {
     
     // Single API call - TodayAndDayForward returns both today's and tomorrow's prices
     var req = new XMLHttpRequest()
+    req.timeout = 10000
     req.onreadystatechange = function() {
         if (req.readyState === XMLHttpRequest.DONE) {
             var success = false
@@ -92,9 +105,9 @@ function fetchFromAPI(callback) {
                     tomorrowDate.setDate(tomorrowDate.getDate() + 1)
                     var tomorrowStr = formatDate(tomorrowDate)
                     tomorrow = parsePricesForDate(data, tomorrowStr)
-                    success = hasPriceData(today)
+                    success = hasPriceData(today) || hasPriceData(tomorrow)
                     if (!success) {
-                        console.error("No valid today prices in API response")
+                        console.error("No valid prices in API response")
                     }
                 } catch (e) {
                     console.error("Error parsing price data:", e)
@@ -104,11 +117,16 @@ function fetchFromAPI(callback) {
             }
             
             if (success) {
+                lastFetchTimestamp = Date.now()
+                lastError = ""
+                lastErrorAt = 0
                 cachePrices(today, tomorrow)
                 callback(today, tomorrow)
                 return
             }
             
+            lastError = req.status ? ("HTTP " + req.status) : (lastError || "Request failed")
+            lastErrorAt = Date.now()
             var cached = loadCachedPrices()
             if (hasPriceData(cached.today) || hasPriceData(cached.tomorrow)) {
                 callback(cached.today, cached.tomorrow)
@@ -118,16 +136,36 @@ function fetchFromAPI(callback) {
             callback([], [])
         }
     }
+    req.onerror = function() {
+        lastError = "Network error"
+        lastErrorAt = Date.now()
+        var cached = loadCachedPrices()
+        if (hasPriceData(cached.today) || hasPriceData(cached.tomorrow)) {
+            callback(cached.today, cached.tomorrow)
+            return
+        }
+        callback([], [])
+    }
+    req.ontimeout = function() {
+        lastError = "Request timeout"
+        lastErrorAt = Date.now()
+        var cached = loadCachedPrices()
+        if (hasPriceData(cached.today) || hasPriceData(cached.tomorrow)) {
+            callback(cached.today, cached.tomorrow)
+            return
+        }
+        callback([], [])
+    }
     
     req.open("GET", "https://api.spot-hinta.fi/TodayAndDayForward")
     req.send()
 }
 
-function parsePrices(data) {
-    // Get today's date string and delegate to parsePricesForDate
-    var today = new Date()
-    var todayStr = formatDate(today)
-    return parsePricesForDate(data, todayStr)
+function canShowTomorrowAfter1415() {
+    var now = new Date()
+    var currentHour = now.getHours()
+    var currentMinute = now.getMinutes()
+    return currentHour > 14 || (currentHour === 14 && currentMinute >= 15)
 }
 
 function parsePricesForDate(data, dateStr) {
@@ -182,6 +220,7 @@ function cachePrices(today, tomorrow) {
             today: today,
             tomorrow: tomorrow
         }
+        lastFetchTimestamp = cache.timestamp
         cachedData = cache
         
         // Persist to file using Plasma's data file mechanism
@@ -201,6 +240,9 @@ function loadCachedPrices() {
             if (data) {
                 var parsed = JSON.parse(data)
                 if (parsed && parsed.date) {
+                    if (parsed.timestamp && parsed.timestamp > lastFetchTimestamp) {
+                        lastFetchTimestamp = parsed.timestamp
+                    }
                     if (!parsed.schemaVersion || parsed.schemaVersion < 2) {
                         parsed.today = normalizeLegacyPriceArray(parsed.today)
                         parsed.tomorrow = normalizeLegacyPriceArray(parsed.tomorrow)
@@ -242,6 +284,43 @@ function normalizeLegacyPriceArray(prices) {
         normalized.push(null)
     }
     return normalized
+}
+
+function shouldThrottleFetch() {
+    if (!lastFetchTimestamp) return false
+    return Date.now() - lastFetchTimestamp < 60 * 60 * 1000
+}
+
+function rolloverToToday(cached) {
+    var updated = cached || { date: null, today: [], tomorrow: [] }
+    if (hasPriceData(updated.tomorrow)) {
+        updated.today = updated.tomorrow
+        updated.tomorrow = []
+        updated.date = formatDate(new Date())
+        updated.timestamp = Date.now()
+        cachedData = updated
+        if (typeof DataFile !== 'undefined') {
+            try {
+                DataFile.write("spotprices.json", JSON.stringify(updated))
+            } catch (e) {
+                console.error("Error caching rollover prices:", e)
+            }
+        }
+        return updated
+    }
+    return updated
+}
+
+function getLastUpdateTime() {
+    return lastFetchTimestamp || 0
+}
+
+function getLastError() {
+    return lastError
+}
+
+function getLastErrorTime() {
+    return lastErrorAt || 0
 }
 
 // Get milliseconds until next 14:15
