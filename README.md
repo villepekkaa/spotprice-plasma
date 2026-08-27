@@ -16,6 +16,8 @@ A KDE Plasma 6 widget for displaying Finnish electricity spot prices from spot-h
 - **Day switching**: Toggle between today and tomorrow's prices
 - **Tomorrow notification**: Shows when tomorrow's prices will be available (14:15 EET)
 
+![Spot price widget](screenshots/widget.png)
+
 ## Installation
 
 ### Method 1: Using Makefile (Recommended)
